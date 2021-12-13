@@ -1,0 +1,12 @@
+<p>
+  <strong>Article:</strong>
+  <%= @image.article_id %>
+</p>
+
+<p>
+  <strong>Cl:</strong>
+  <%= @image.cl_id %>
+</p>
+
+<%= link_to 'Edit', edit_image_path(@image) %> |
+<%= link_to 'Back', images_path %>
