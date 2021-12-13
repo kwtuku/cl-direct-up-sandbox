@@ -1,57 +1,63 @@
 class ImagesController < ApplicationController
-  before_action :set_image, only: %i[show edit update destroy]
-
-  # GET /images
+  # GET /articles/1/images
   def index
-    @images = Image.all
+    @article = Article.find(params[:article_id])
+    @images = @article.images
   end
 
-  # GET /images/1
-  def show; end
+  # GET /articles/1/images/1
+  def show
+    @article = Article.find(params[:article_id])
+    @image = @article.images.find(params[:id])
+  end
 
-  # GET /images/new
+  # GET /articles/1/images/new
   def new
+    @article = Article.find(params[:article_id])
     @image = Image.new
   end
 
-  # GET /images/1/edit
-  def edit; end
+  # GET /articles/1/images/1/edit
+  def edit
+    @article = Article.find(params[:article_id])
+    @image = @article.images.find(params[:id])
+  end
 
-  # POST /images
+  # POST /articles/1/images
   def create
-    @image = Image.new(image_params)
+    @article = Article.find(params[:article_id])
+    @image = @article.images.new(image_params)
 
     if @image.save
-      redirect_to @image, notice: 'Image was successfully created.'
+      redirect_to article_image_url(@article, @image), notice: 'Image was successfully created.'
     else
       render :new
     end
   end
 
-  # PATCH/PUT /images/1
+  # PATCH/PUT /articles/1/images/1
   def update
+    @article = Article.find(params[:article_id])
+    @image = @article.images.find(params[:id])
     if @image.update(image_params)
-      redirect_to @image, notice: 'Image was successfully updated.'
+      redirect_to article_image_url(@article, @image), notice: 'Image was successfully updated.'
     else
       render :edit
     end
   end
 
-  # DELETE /images/1
+  # DELETE /articles/1/images/1
   def destroy
+    @article = Article.find(params[:article_id])
+    @image = @article.images.find(params[:id])
     @image.destroy
-    redirect_to images_url, notice: 'Image was successfully destroyed.'
+    redirect_to article_images_url(@article), notice: 'Image was successfully destroyed.'
   end
 
   private
 
-  # Use callbacks to share common setup or constraints between actions.
-  def set_image
-    @image = Image.find(params[:id])
-  end
-
   # Only allow a list of trusted parameters through.
   def image_params
-    params.require(:image).permit(:article_id, :cl_id)
+    params.require(:image).permit(:cl_id)
   end
 end

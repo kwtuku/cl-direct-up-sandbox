@@ -1,6 +1,6 @@
 <p>
   <strong>Article:</strong>
-  <%= @image.article_id %>
+  <%= link_to "Article #{@article.id}", article_path(@article) %>
 </p>
 
 <p>
@@ -8,5 +8,6 @@
   <%= @image.cl_id %>
 </p>
 
-<%= link_to 'Edit', edit_image_path(@image) %> |
-<%= link_to 'Back', images_path %>
+<%= link_to 'Edit', edit_article_image_path(@article, @image) %> |
+<%= link_to 'Destroy', article_image_path(@article, @image), method: :delete, data: { confirm: 'Are you sure?' } %> |
+<%= link_to "Article #{@article.id} Images", article_images_path(@article) %>

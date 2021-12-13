@@ -6,6 +6,8 @@
       <th>Title</th>
       <th>Body</th>
       <th colspan="3"></th>
+      <th>Images</th>
+      <th>New Images</th>
     </tr>
   </thead>
 
@@ -17,6 +19,12 @@
         <td><%= link_to 'Show', article %></td>
         <td><%= link_to 'Edit', edit_article_path(article) %></td>
         <td><%= link_to 'Destroy', article, method: :delete, data: { confirm: 'Are you sure?' } %></td>
+        <td>
+          <% article.images.each do |image| %>
+            <%= link_to image.cl_id, article_image_path(article, image) %>
+          <% end %>
+        </td>
+        <td><%= link_to "Article #{article.id} New Images", new_article_image_path(article) %></td>
       </tr>
     <% end %>
   </tbody>
