@@ -1,5 +1,6 @@
 <%= link_to 'Edit', edit_article_path(@article) %> |
-<%= link_to 'Destroy', @article, method: :delete, data: { confirm: 'Are you sure?' } %>
+<%= link_to 'Destroy', @article, method: :delete, data: { confirm: 'Are you sure?' } %> |
+<%= link_to 'New Images', new_article_image_path(@article) %>
 
 <p>
   <strong>Title:</strong>
@@ -16,9 +17,9 @@
   <%= 'No image' if @article.images.blank? %>
 </p>
 
-<div class="columns">
+<div class="columns is-multiline">
   <% @article.images.each do |image| %>
-    <div class="column is-4">
+    <div class="column is-3">
       <div class="card">
         <div class="card-image">
           <figure class="image is-1by1">
