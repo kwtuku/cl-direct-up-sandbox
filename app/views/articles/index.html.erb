@@ -1,36 +1,40 @@
 <h1>Articles</h1>
 
-<table>
-  <thead>
-    <tr>
-      <th>Title</th>
-      <th>Body</th>
-      <th colspan="3"></th>
-      <th>Images</th>
-      <th>New Images</th>
-    </tr>
-  </thead>
-
-  <tbody>
-    <% @articles.each do |article| %>
-      <tr>
-        <td><%= article.title %></td>
-        <td><%= article.body %></td>
-        <td><%= link_to 'Show', article %></td>
-        <td><%= link_to 'Edit', edit_article_path(article) %></td>
-        <td><%= link_to 'Destroy', article, method: :delete, data: { confirm: 'Are you sure?' } %></td>
-        <td>
-          <% article.images.each do |image| %>
-            <%= image.cl_id %> |
-            <%= link_to 'Edit', edit_article_image_path(article, image) %>
-          <% end %>
-        </td>
-        <td><%= link_to "Article #{article.id} New Images", new_article_image_path(article) %></td>
-      </tr>
-    <% end %>
-  </tbody>
-</table>
-
-<br>
-
 <%= link_to 'New Article', new_article_path %>
+
+<div class="columns">
+  <% @articles.each do |article| %>
+    <div class="column is-3">
+      <div class="card">
+        <div class="card-image">
+          <figure class="image is-1by1">
+            <% if article.images.first %>
+              <%= cl_image_tag article.images.first.cl_id.url %>
+            <% else %>
+              <img src="https://placehold.jp/500x500.png">
+            <% end %>
+          </figure>
+        </div>
+        <div class="card-content">
+          <p>
+            ID: <%= article.id %>
+          </p>
+          <p>
+            Title: <%= article.title %>
+          </p>
+          <p>
+            Body: <%= article.body %>
+          </p>
+          <p>
+            <%= link_to 'Show', article %> |
+            <%= link_to 'Edit', edit_article_path(article) %> |
+            <%= link_to 'Destroy', article, method: :delete, data: { confirm: 'Are you sure?' } %>
+          </p>
+          <p>
+            <%= link_to 'New Images', new_article_image_path(article) %>
+          </p>
+        </div>
+      </div>
+    </div>
+  <% end %>
+</div>
