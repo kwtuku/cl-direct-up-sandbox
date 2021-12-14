@@ -4,6 +4,6 @@ Rails.application.routes.draw do
   root to: 'articles#index'
 
   resources :articles do
-    resources :images
+    resources :images, only: %i[new create edit update destroy]
   end
 end

@@ -11,7 +11,8 @@
 <p>
   <strong>Images:</strong>
   <% @article.images.each do |image| %>
-    <%= link_to image.cl_id, article_image_path(@article, image) %>
+    <%= image.cl_id %> |
+    <%= link_to 'Edit', edit_article_image_path(@article, image) %>
   <% end %>
 </p>
 

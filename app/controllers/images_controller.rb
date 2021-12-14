@@ -1,16 +1,4 @@
 class ImagesController < ApplicationController
-  # GET /articles/1/images
-  def index
-    @article = Article.find(params[:article_id])
-    @images = @article.images
-  end
-
-  # GET /articles/1/images/1
-  def show
-    @article = Article.find(params[:article_id])
-    @image = @article.images.find(params[:id])
-  end
-
   # GET /articles/1/images/new
   def new
     @article = Article.find(params[:article_id])

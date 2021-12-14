@@ -2,5 +2,4 @@
 
 <%= render 'form', article: @article, image: @image %>
 
-<%= link_to 'Show', article_image_path(@article, @image) %>
-<%= link_to "Article #{@article.id} Images", article_images_path(@article) %>
+<%= link_to "Article #{@article.id}", article_path(@article) %>
