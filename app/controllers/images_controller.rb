@@ -39,7 +39,7 @@ class ImagesController < ApplicationController
     @article = Article.find(params[:article_id])
     @image = @article.images.find(params[:id])
     @image.destroy
-    redirect_to article_images_url(@article), notice: 'Image was successfully destroyed.'
+    redirect_to article_url(@article), notice: 'Image was successfully destroyed.'
   end
 
   private
