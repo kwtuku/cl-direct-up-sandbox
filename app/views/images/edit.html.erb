@@ -1,5 +1,7 @@
 <h1>Editing Image</h1>
 
+<%= cl_image_tag @image.cl_id.url, width: 500, height: 500, crop: :fill %>
+
 <%= render 'form', article: @article, image: @image %>
 
 <%= link_to "Article #{@article.id}", article_path(@article) %>
