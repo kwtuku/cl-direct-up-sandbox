@@ -1,7 +1,12 @@
 $(document).ready(function () {
   $(".cloudinary-fileupload")
     .cloudinary_fileupload({
+      acceptFileTypes: /(\.|\/)(jpe?g|png|webp)$/i,
+      maxFileSize: 2000000,
       dropZone: "#drop-zone",
+      processalways: function (e, data) {
+        if (data.files.error) alert(data.files[0].error);
+      },
       start: function (e) {
         $("#cloudinary-fileupload-status").removeClass("is-hidden");
         $("#cloudinary-fileupload-message").text("Starting upload...");

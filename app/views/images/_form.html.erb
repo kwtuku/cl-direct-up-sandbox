@@ -17,7 +17,7 @@
 
     <div class="file is-primary is-flex is-justify-content-center block">
       <label class="file-label">
-        <%= form.cl_image_upload :cl_id, return_delete_token: true, html: { class: 'file-input' } %>
+        <%= form.cl_image_upload :cl_id, return_delete_token: true, html: { class: 'file-input', accept: 'image/jpg, image/jpeg, image/png, image/webp' } %>
         <span class="file-cta">
           <span class="file-label">
             Choose a file…
@@ -40,8 +40,6 @@
     </div>
   </div>
 <% end %>
-
-<div id="info"></div>
 
 <%= cloudinary_js_config %>
 <%= javascript_pack_tag 'jqueryCloudinaryUpload', 'data-turbolinks-track': 'reload' %>
