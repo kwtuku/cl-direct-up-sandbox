@@ -9,7 +9,7 @@
         <div class="card-image">
           <figure class="image is-1by1">
             <% if article.images.first %>
-              <%= cl_image_tag article.images.first.cl_id.url %>
+              <%= cl_image_tag article.images.first.cl_id, width: 500, height: 500, crop: :fill %>
             <% else %>
               <img src="https://placehold.jp/500x500.png">
             <% end %>

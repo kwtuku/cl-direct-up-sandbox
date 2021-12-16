@@ -23,7 +23,7 @@
       <div class="card">
         <div class="card-image">
           <figure class="image is-1by1">
-            <%= cl_image_tag image.cl_id.url %>
+            <%= cl_image_tag image.cl_id, width: 500, height: 500, crop: :fill %>
           </figure>
         </div>
         <div class="card-content">
