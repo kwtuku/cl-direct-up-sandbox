@@ -11,18 +11,20 @@ class ArticlesController < ApplicationController
 
   # GET /articles/new
   def new
-    @article = Article.new
+    @article_form = ArticleForm.new
   end
 
   # GET /articles/1/edit
-  def edit; end
+  def edit
+    @article_form = ArticleForm.new(article: @article)
+  end
 
   # POST /articles
   def create
-    @article = Article.new(article_params)
+    @article_form = ArticleForm.new(article_params)
 
-    if @article.save
-      redirect_to @article, notice: 'Article was successfully created.'
+    if @article_form.save
+      redirect_to @article_form, notice: 'Article was successfully created.'
     else
       render :new
     end
@@ -30,8 +32,10 @@ class ArticlesController < ApplicationController
 
   # PATCH/PUT /articles/1
   def update
-    if @article.update(article_params)
-      redirect_to @article, notice: 'Article was successfully updated.'
+    @article_form = ArticleForm.new(article_params, article: @article)
+
+    if @article_form.save
+      redirect_to @article_form, notice: 'Article was successfully updated.'
     else
       render :edit
     end
@@ -52,6 +56,6 @@ class ArticlesController < ApplicationController
 
   # Only allow a list of trusted parameters through.
   def article_params
-    params.require(:article).permit(:title, :body)
+    params.require(:article).permit(:title, :body, cl_ids: [])
   end
 end
