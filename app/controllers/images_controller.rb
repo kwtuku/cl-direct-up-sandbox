@@ -16,13 +16,6 @@ class ImagesController < ApplicationController
     @article = Article.find(params[:article_id])
     @image = @article.images.new(image_params)
 
-    if image_params[:cl_id].present?
-      preloaded = Cloudinary::PreloadedFile.new(image_params[:cl_id])
-      raise 'Invalid upload signature' unless preloaded.valid?
-
-      @image.cl_id = preloaded.identifier
-    end
-
     if @image.save
       redirect_to article_url(@article), notice: 'Image was successfully created.'
     else
@@ -34,13 +27,6 @@ class ImagesController < ApplicationController
   def update
     @article = Article.find(params[:article_id])
     @image = @article.images.find(params[:id])
-
-    if image_params[:cl_id].present?
-      preloaded = Cloudinary::PreloadedFile.new(image_params[:cl_id])
-      raise 'Invalid upload signature' unless preloaded.valid?
-
-      @image.cl_id = preloaded.identifier
-    end
 
     if @image.update(image_params)
       redirect_to article_url(@article), notice: 'Image was successfully updated.'
