@@ -12,21 +12,61 @@
   <% end %>
 
   <div class="field">
-    <%= form.label :title %>
-    <%= form.text_field :title %>
+    <%= form.label :title, class: 'label' %>
+    <div class="control">
+      <%= form.text_field :title, class: 'input' %>
+    </div>
   </div>
 
   <div class="field">
-    <%= form.label :body %>
-    <%= form.text_area :body %>
+    <%= form.label :body, class: 'label' %>
+    <div class="control">
+      <%= form.text_area :body, class: 'textarea' %>
+    </div>
   </div>
 
   <div class="field">
-    <%= form.label :cl_ids %>
-    <%= form.file_field :cl_ids, multiple: true %>
+    <%= form.label :cl_ids, class: 'label' %>
+    <div class="columns is-multiline is-centered" id="cloudinary-fileupload-previews">
+      <% article&.images&.each do |image| %>
+        <div class="column is-2 is-flex">
+          <figure>
+            <%= cl_image_tag image.cl_id, width: 500, height: 500, crop: :fill %>
+          </figure>
+          <%= link_to 'Destroy', article_image_path(article, image), method: :delete, data: { confirm: 'Are you sure?' }, class: 'delete is-medium' %>
+        </div>
+      <% end %>
+    </div>
+    <div class="control">
+      <div class="box has-text-centered has-background-light p-6" id="drop-zone">
+        <p class="block">Drag and drop assets here</p>
+        <p class="block">or</p>
+
+        <div class="file is-primary is-inline-flex is-justify-content-center block">
+          <label class="file-label">
+            <%= form.cl_image_upload :cl_ids, return_delete_token: true, html: { class: 'file-input', accept: 'image/jpg, image/jpeg, image/png, image/webp', multiple: true, data: { cloudinary_field: 'article[cl_ids][]' } } %>
+            <span class="file-cta">
+              <span class="file-label">
+                Choose a file…
+              </span>
+            </span>
+          </label>
+        </div>
+
+        <div class="is-hidden block" id="cloudinary-fileupload-status">
+          <progress class="progress is-primary" value="0" max="100" id="cloudinary-fileupload-progress"></progress>
+          <span id="cloudinary-fileupload-message"></span>
+        </div>
+      </div>
+    </div>
   </div>
 
-  <div class="actions">
-    <%= form.submit %>
+  <div class="field">
+    <div class="control">
+      <%= form.submit class: 'button is-primary' %>
+    </div>
   </div>
 <% end %>
+
+<%= cloudinary_js_config %>
+<%= javascript_pack_tag 'jqueryCloudinaryMultipleUpload', 'data-turbolinks-track': 'reload' %>
