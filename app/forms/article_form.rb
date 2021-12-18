@@ -5,6 +5,10 @@ class ArticleForm
 
   delegate :persisted?, to: :article
 
+  validates :title, presence: true
+  validates :body, presence: true
+  validate :validate_image_count
+
   def initialize(attributes = nil, article: Article.new)
     @article = article
     attributes ||= default_attributes
@@ -38,5 +42,14 @@ class ArticleForm
       body: article.body,
       cl_ids: article.images.pluck(:cl_id)
     }
+  end
+
+  IMAGE_MAX_COUNT = 10
+  def validate_image_count
+    return unless cl_ids
+
+    return unless article.images.size >= IMAGE_MAX_COUNT
+
+    errors.add(:base, :too_many_images, message: "記事の画像は#{IMAGE_MAX_COUNT}枚以下にしてください")
   end
 end

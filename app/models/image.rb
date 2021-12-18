@@ -11,6 +11,6 @@ class Image < ApplicationRecord
   def validate_image_count
     return unless article.images.size >= IMAGE_MAX_COUNT
 
-    errors.add(:base, :too_many_images, message: "は#{IMAGE_MAX_COUNT}枚以下にしてください")
+    errors.add(:base, :too_many_images, message: "記事の画像は#{IMAGE_MAX_COUNT}枚以下にしてください")
   end
 end
