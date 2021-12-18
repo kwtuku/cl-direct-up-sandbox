@@ -19,7 +19,8 @@ class ArticleForm
       cl_ids&.each { |cl_id| article.images.create!(cl_id: cl_id) }
     end
     true
-  rescue ActiveRecord::RecordInvalid
+  rescue ActiveRecord::RecordInvalid => e
+    e.record.errors.each { |error| errors.add(error.attribute.to_sym, error.type.to_sym, message: error.message) }
     false
   end
 
