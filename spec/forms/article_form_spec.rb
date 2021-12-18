@@ -2,6 +2,46 @@ require 'rails_helper'
 
 RSpec.describe ArticleForm, type: :model do
   describe '#save' do
+    context 'when an article title is blank' do
+      let(:article_form) do
+        attributes = attributes_for(:article, title: nil)
+        described_class.new(attributes, article: Article.new)
+      end
+
+      it 'returns false' do
+        expect(article_form.save).to be_falsey
+      end
+
+      it 'has the error' do
+        article_form.save
+        expect(article_form.errors).to be_of_kind(:title, :blank)
+      end
+
+      it 'does not increase article count' do
+        expect { article_form.save }.to change(Article, :count).by(0)
+      end
+    end
+
+    context 'when an article body is blank' do
+      let(:article_form) do
+        attributes = attributes_for(:article, body: nil)
+        described_class.new(attributes, article: Article.new)
+      end
+
+      it 'returns false' do
+        expect(article_form.save).to be_falsey
+      end
+
+      it 'has the error' do
+        article_form.save
+        expect(article_form.errors).to be_of_kind(:body, :blank)
+      end
+
+      it 'does not increase article count' do
+        expect { article_form.save }.to change(Article, :count).by(0)
+      end
+    end
+
     context 'without images' do
       let(:article_form) do
         attributes = attributes_for(:article)
