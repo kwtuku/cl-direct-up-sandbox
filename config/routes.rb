@@ -3,6 +3,14 @@ Rails.application.routes.draw do
 
   root to: 'articles#index'
 
+  namespace :api, format: 'json' do
+    namespace :v0 do
+      resources :articles, only: %i[] do
+        resources :images, only: %i[destroy]
+      end
+    end
+  end
+
   resources :articles do
     resources :images, only: %i[new create edit update destroy]
   end
