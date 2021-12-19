@@ -360,5 +360,95 @@ RSpec.describe ArticleForm, type: :model do
         end
       end
     end
+
+    context 'when article and images are invalid' do
+      context 'when new arcitle' do
+        let(:article_form) do
+          images = []
+          11.times do
+            example_image = Rails.root.join("spec/fixtures/files/example.#{%w[jpg jpeg png webp].sample}")
+            images << Rack::Test::UploadedFile.new(example_image)
+          end
+          cl_ids = { cl_ids: images }
+          attributes = attributes_for(:article, title: nil).merge(cl_ids)
+          described_class.new(attributes, article: Article.new)
+        end
+
+        it 'returns false' do
+          expect(article_form.save).to be_falsey
+        end
+
+        it 'has article error and image error' do
+          article_form.save
+          expect(article_form.errors).to be_of_kind(:title, :blank)
+          expect(article_form.errors).to be_of_kind(:base, :too_many_images)
+        end
+      end
+
+      context 'when an article exists and has an image' do
+        let(:article_form) do
+          images = []
+          10.times do
+            example_image = Rails.root.join("spec/fixtures/files/example.#{%w[jpg jpeg png webp].sample}")
+            images << Rack::Test::UploadedFile.new(example_image)
+          end
+          cl_ids = { cl_ids: images }
+          attributes = attributes_for(:article, title: nil).merge(cl_ids)
+          described_class.new(attributes, article: create(:article, :with_an_image))
+        end
+
+        it 'returns false' do
+          expect(article_form.save).to be_falsey
+        end
+
+        it 'has article error and image error' do
+          article_form.save
+          expect(article_form.errors).to be_of_kind(:title, :blank)
+          expect(article_form.errors).to be_of_kind(:base, :too_many_images)
+        end
+      end
+
+      context 'when an article exists and has 9 images' do
+        let(:article_form) do
+          images = []
+          2.times do
+            example_image = Rails.root.join("spec/fixtures/files/example.#{%w[jpg jpeg png webp].sample}")
+            images << Rack::Test::UploadedFile.new(example_image)
+          end
+          cl_ids = { cl_ids: images }
+          attributes = attributes_for(:article, title: nil).merge(cl_ids)
+          described_class.new(attributes, article: create(:article, :with_9_images))
+        end
+
+        it 'returns false' do
+          expect(article_form.save).to be_falsey
+        end
+
+        it 'has article error and image error' do
+          article_form.save
+          expect(article_form.errors).to be_of_kind(:title, :blank)
+          expect(article_form.errors).to be_of_kind(:base, :too_many_images)
+        end
+      end
+
+      context 'when an article exists and has 10 images' do
+        let(:article_form) do
+          example_image = Rails.root.join("spec/fixtures/files/example.#{%w[jpg jpeg png webp].sample}")
+          cl_ids = { cl_ids: [Rack::Test::UploadedFile.new(example_image)] }
+          attributes = attributes_for(:article, title: nil).merge(cl_ids)
+          described_class.new(attributes, article: create(:article, :with_10_images))
+        end
+
+        it 'returns false' do
+          expect(article_form.save).to be_falsey
+        end
+
+        it 'has article error and image error' do
+          article_form.save
+          expect(article_form.errors).to be_of_kind(:title, :blank)
+          expect(article_form.errors).to be_of_kind(:base, :too_many_images)
+        end
+      end
+    end
   end
 end

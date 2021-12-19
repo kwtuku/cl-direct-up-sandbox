@@ -48,7 +48,7 @@ class ArticleForm
   def validate_image_count
     return unless cl_ids
 
-    return unless article.images.size >= IMAGE_MAX_COUNT
+    return if (article.images.size + cl_ids.size) <= IMAGE_MAX_COUNT
 
     errors.add(:base, :too_many_images, message: "記事の画像は#{IMAGE_MAX_COUNT}枚以下にしてください")
   end
