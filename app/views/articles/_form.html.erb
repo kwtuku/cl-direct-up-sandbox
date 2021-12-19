@@ -33,7 +33,7 @@
           <figure>
             <%= cl_image_tag image.cl_id, width: 500, height: 500, crop: :fill %>
           </figure>
-          <%= link_to 'Destroy', article_image_path(article, image), method: :delete, data: { confirm: 'Are you sure?' }, class: 'delete is-medium' %>
+          <button type="button" class="delete is-medium js-delete-image-button" data-article-id="<%= article.id %>" data-image-id="<%= image.id %>"></button>
         </div>
       <% end %>
     </div>
@@ -70,3 +70,4 @@
 
 <%= cloudinary_js_config %>
 <%= javascript_pack_tag 'jqueryCloudinaryMultipleUpload', 'data-turbolinks-track': 'reload' %>
+<%= javascript_pack_tag 'removeImage', 'data-turbolinks-track': 'reload' %>
