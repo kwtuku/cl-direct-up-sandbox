@@ -4,6 +4,7 @@ $(document).ready(function () {
   const fileuploadStatus = $("#cloudinary-fileupload-status");
   const fileuploadProgress = $("#cloudinary-fileupload-progress");
   const fileuploadMessage = $("#cloudinary-fileupload-message");
+
   $(".cloudinary-fileupload")
     .cloudinary_fileupload({
       acceptFileTypes: /(\.|\/)(jpe?g|png|webp)$/i,
@@ -21,13 +22,14 @@ $(document).ready(function () {
         fileuploadMessage.text(`Uploading... ${Math.round((data.loaded * 100.0) / data.total)}%`);
       },
       fail: function (e, data) {
-        fileuploadMessage.text("Upload failed");
+        alert("Upload failed");
       }
     })
     .off("cloudinarydone").on("cloudinarydone", function (e, data) {
       fileuploadStatus.addClass("is-hidden");
       currentImage.addClass("is-hidden");
-      var column = $(`<div class="column is-2 is-flex"></div>`).appendTo(preview);
+      const column = $('<div class="column is-2 is-flex"></div>').appendTo(preview);
+
       $.cloudinary.image(data.result.public_id, {
         format: data.result.format, width: 500, height: 500, crop: "fill"
       }).appendTo($("<figure>").appendTo(column));
