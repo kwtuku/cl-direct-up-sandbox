@@ -8,6 +8,7 @@ Rails.application.routes.draw do
       resources :articles, only: %i[] do
         resources :images, only: %i[destroy]
       end
+      resources :admin_cloudinary, only: %i[destroy]
     end
   end
 

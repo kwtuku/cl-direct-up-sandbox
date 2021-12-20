@@ -1,5 +1,9 @@
 <%= form_with(model: article_form) do |form| %>
   <% if article_form.errors.any? %>
+    <% article_form.cl_ids.each do |cl_id| %>
+      <%= form.hidden_field :cl_ids, name: 'article[cl_ids][]', value: cl_id %>
+    <% end %>
+
     <div id="error_explanation">
       <h2><%= pluralize(article_form.errors.count, "error") %> prohibited this article from being saved:</h2>
 
@@ -36,6 +40,17 @@
           <button type="button" class="delete is-medium js-delete-image-button" data-article-id="<%= article.id %>" data-image-id="<%= image.id %>"></button>
         </div>
       <% end %>
+
+      <% if article_form.errors.any? %>
+        <% article_form.cl_ids.each do |cl_id| %>
+          <div class="column is-2 is-flex">
+            <figure>
+              <%= cl_image_tag cl_id.split('#')[0].split('/')[3], width: 500, height: 500, crop: :fill %>
+            </figure>
+            <button type="button" class="delete is-medium js-delete-image-cache-button" data-public-id="<%= cl_id.split('#')[0].split('/')[3].split('.')[0] %>"></button>
+          </div>
+        <% end %>
+      <% end %>
     </div>
     <div class="control">
       <div class="box has-text-centered has-background-light p-6" id="drop-zone">
@@ -71,3 +86,4 @@
 <%= cloudinary_js_config %>
 <%= javascript_pack_tag 'jqueryCloudinaryMultipleUpload', 'data-turbolinks-track': 'reload' %>
 <%= javascript_pack_tag 'removeImage', 'data-turbolinks-track': 'reload' %>
+<%= javascript_pack_tag 'removeImageCache', 'data-turbolinks-track': 'reload' %>
