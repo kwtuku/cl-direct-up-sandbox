@@ -21,7 +21,10 @@ $(document).ready(function () {
 
         fileuploadProgress.val(progressAllValue);
         fileuploadMessage.text(`Uploading... ${progressAllValue}%`);
-        if (progressAllValue === 100) { fileuploadStatus.addClass("is-hidden"); }
+        if (progressAllValue === 100) {
+          fileuploadStatus.addClass("is-hidden");
+          fileuploadProgress.val("0");
+        }
       },
       fail: function (e, data) {
         alert("Upload failed");

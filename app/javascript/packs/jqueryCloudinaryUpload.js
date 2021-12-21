@@ -1,5 +1,4 @@
 $(document).ready(function () {
-  const currentImage = $("#current-image");
   const preview = $("#cloudinary-fileupload-preview");
   const fileuploadStatus = $("#cloudinary-fileupload-status");
   const fileuploadProgress = $("#cloudinary-fileupload-progress");
@@ -27,8 +26,9 @@ $(document).ready(function () {
     })
     .off("cloudinarydone").on("cloudinarydone", function (e, data) {
       fileuploadStatus.addClass("is-hidden");
-      currentImage.addClass("is-hidden");
-      const column = $('<div class="column is-2 is-flex"></div>').appendTo(preview);
+      fileuploadProgress.val("0");
+
+      const column = $('<div class="column is-2 is-flex"></div>').appendTo(preview.html(""));
 
       $.cloudinary.image(data.result.public_id, {
         format: data.result.format, width: 500, height: 500, crop: "fill"
@@ -44,8 +44,7 @@ $(document).ready(function () {
           e.preventDefault();
           $.cloudinary.delete_by_token($(this).data("delete_token")).done(function () {
             column.remove();
-            currentImage.removeClass("is-hidden");
-            $('input[name="image[cl_id]"]').remove();
+            $('input[name="image[cl_id]"]').val("");
           }).fail(function () {
             alert("Cannot delete image");
           });
