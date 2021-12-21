@@ -28,7 +28,7 @@ $(document).ready(function () {
       fileuploadStatus.addClass("is-hidden");
       fileuploadProgress.val("0");
 
-      const column = $('<div class="column is-2 is-flex"></div>').appendTo(preview.html(""));
+      const column = $('<div class="column is-one-fifth is-flex"></div>').appendTo(preview.html(""));
 
       $.cloudinary.image(data.result.public_id, {
         format: data.result.format, width: 500, height: 500, crop: "fill"

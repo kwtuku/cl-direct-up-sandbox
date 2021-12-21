@@ -31,7 +31,7 @@ $(document).ready(function () {
       }
     })
     .off("cloudinarydone").on("cloudinarydone", function (e, data) {
-      const preview = $('<div class="column is-2 is-flex"></div>').appendTo(previews);
+      const preview = $('<div class="column is-one-fifth is-flex"></div>').appendTo(previews);
       const publicId = data.result.public_id;
 
       $.cloudinary.image(publicId, {

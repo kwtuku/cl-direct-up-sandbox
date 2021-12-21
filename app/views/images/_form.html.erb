@@ -1,11 +1,11 @@
-<%= form_with(model: [article, image]) do |form| %>
+<%= form_with(model: [article, image], class: 'box') do |form| %>
   <%= form.hidden_field :cl_id, name: 'image[cl_id]', value: image.cl_id.cache_name %>
 
   <% if image.errors.any? %>
-    <div id="error_explanation">
-      <h2><%= pluralize(image.errors.count, "error") %> prohibited this image from being saved:</h2>
+    <div class="message is-danger"id="error_explanation">
+      <h2 class="message-header"><%= pluralize(image.errors.count, "error") %> prohibited this image from being saved:</h2>
 
-      <ul>
+      <ul class="message-body">
         <% image.errors.each do |error| %>
           <li><%= error.full_message %></li>
         <% end %>
@@ -17,7 +17,7 @@
     <%= form.label :cl_id, class: 'label' %>
     <div class="columns is-multiline is-centered" id="cloudinary-fileupload-preview">
       <% if image.cl_id.present? %>
-        <div class="column is-2 is-flex" id="current-image">
+        <div class="column is-one-fifth is-flex" id="current-image">
           <figure>
             <%= cl_image_tag image.cl_id, width: 500, height: 500, crop: :fill %>
           </figure>
@@ -53,9 +53,12 @@
     </div>
   </div>
 
-  <div class="field">
+  <div class="field is-grouped">
     <div class="control">
       <%= form.submit class: 'button is-primary' %>
+    </div>
+    <div class="control">
+      <%= link_to 'キャンセル', article_path(article), class: 'button is-light' %>
     </div>
   </div>
 <% end %>

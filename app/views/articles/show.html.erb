@@ -1,6 +1,6 @@
 <%= link_to 'Edit', edit_article_path(@article) %> |
 <%= link_to 'Destroy', @article, method: :delete, data: { confirm: 'Are you sure?' } %> |
-<%= link_to 'New Images', new_article_image_path(@article) %>
+<%= link_to 'New Image', new_article_image_path(@article) %>
 
 <p>
   <strong>Title:</strong>
@@ -19,7 +19,7 @@
 
 <div class="columns is-multiline">
   <% @article.images.each do |image| %>
-    <div class="column is-3">
+    <div class="column is-one-fifth">
       <div class="card">
         <div class="card-image">
           <figure class="image is-1by1">

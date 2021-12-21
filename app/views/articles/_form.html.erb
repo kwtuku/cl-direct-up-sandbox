@@ -1,13 +1,13 @@
-<%= form_with(model: article_form) do |form| %>
+<%= form_with(model: article_form, class: 'box') do |form| %>
   <% if article_form.errors.any? %>
     <% article_form.cl_ids&.each do |cl_id| %>
       <%= form.hidden_field :cl_ids, name: 'article[cl_ids][]', value: cl_id %>
     <% end %>
 
-    <div id="error_explanation">
-      <h2><%= pluralize(article_form.errors.count, "error") %> prohibited this article from being saved:</h2>
+    <div class="message is-danger" id="error_explanation">
+      <h2 class="message-header"><%= pluralize(article_form.errors.count, "error") %> prohibited this article from being saved:</h2>
 
-      <ul>
+      <ul class="message-body">
         <% article_form.errors.each do |error| %>
           <li><%= error.full_message %></li>
         <% end %>
@@ -33,7 +33,7 @@
     <%= form.label :cl_ids, class: 'label' %>
     <div class="columns is-multiline is-centered" id="cloudinary-fileupload-previews">
       <% article&.images&.each do |image| %>
-        <div class="column is-2 is-flex">
+        <div class="column is-one-fifth is-flex">
           <figure>
             <%= cl_image_tag image.cl_id, width: 500, height: 500, crop: :fill %>
           </figure>
@@ -43,7 +43,7 @@
 
       <% if article_form.errors.any? %>
         <% article_form.cl_ids&.each do |cl_id| %>
-          <div class="column is-2 is-flex">
+          <div class="column is-one-fifth is-flex">
             <figure>
               <%= cl_image_tag cl_id.split('#')[0].split('/')[3], width: 500, height: 500, crop: :fill %>
             </figure>
@@ -76,9 +76,12 @@
     </div>
   </div>
 
-  <div class="field">
+  <div class="field is-grouped">
     <div class="control">
       <%= form.submit class: 'button is-primary' %>
+    </div>
+    <div class="control">
+      <%= link_to 'キャンセル', (article.present? ? article_path(article) : articles_path), class: 'button is-light' %>
     </div>
   </div>
 <% end %>

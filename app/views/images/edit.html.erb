@@ -1,5 +1,3 @@
-<h1>Editing Image</h1>
+<h1 class="title">Editing Image of <%= link_to "Article #{@article.id}", article_path(@article) %></h1>
 
 <%= render 'form', article: @article, image: @image %>
-
-<%= link_to "Article #{@article.id}", article_path(@article) %>
