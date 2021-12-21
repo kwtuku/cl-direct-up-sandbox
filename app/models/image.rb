@@ -3,6 +3,7 @@ class Image < ApplicationRecord
 
   mount_uploader :cl_id, ImageUploader
 
+  validates :cl_id, presence: true
   validate :validate_image_count
 
   private
