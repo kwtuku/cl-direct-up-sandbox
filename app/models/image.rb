@@ -3,7 +3,7 @@ class Image < ApplicationRecord
 
   mount_uploader :cl_id, ImageUploader
 
-  validates :cl_id, presence: true
+  validates :cl_id, presence: { message: 'をアップロードしてください' }
   validate :validate_image_count
 
   private

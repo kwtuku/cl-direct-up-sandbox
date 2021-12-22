@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html lang="ja">
   <head>
     <title>Cloudinary direct upload sandbox</title>
     <meta name="viewport" content="width=device-width,initial-scale=1">
@@ -14,18 +14,20 @@
   <body>
     <header>
       <nav class="navbar has-shadow" role="navigation" aria-label="main navigation">
-        <div class="navbar-brand">
-          <%= link_to 'トップ', root_path, class: 'navbar-item' %>
-          <%= link_to 'アカウント編集', edit_user_registration_path, class: 'navbar-item' if user_signed_in? %>
-          <div class="navbar-item">
-            <div class="buttons">
-              <%= link_to 'New Article', new_article_path, class: 'button is-primary' %>
-              <% if user_signed_in? %>
-                <%= link_to 'ログアウト', destroy_user_session_path, method: :delete, class: 'button is-light' %>
-              <% else %>
-                <%= link_to 'ログイン', new_user_session_path, class: 'button is-primary' %>
-                <%= link_to 'アカウント登録', new_user_registration_path, class: 'button is-light' %>
-              <% end %>
+        <div class="container">
+          <div class="navbar-brand">
+            <%= link_to 'トップ', root_path, class: 'navbar-item' %>
+            <%= link_to 'アカウント編集', edit_user_registration_path, class: 'navbar-item' if user_signed_in? %>
+            <div class="navbar-item">
+              <div class="buttons">
+                <%= link_to '記事を作成', new_article_path, class: 'button is-primary' %>
+                <% if user_signed_in? %>
+                  <%= link_to 'ログアウト', destroy_user_session_path, method: :delete, class: 'button is-light' %>
+                <% else %>
+                  <%= link_to 'ログイン', new_user_session_path, class: 'button is-primary is-light' %>
+                  <%= link_to 'アカウント登録', new_user_registration_path, class: 'button is-light' %>
+                <% end %>
+              </div>
             </div>
           </div>
         </div>
@@ -45,7 +47,9 @@
 
     <main>
       <div class="container">
-        <%= yield %>
+        <section class="section">
+          <%= yield %>
+        </section>
       </div>
     </main>
   </body>

@@ -17,7 +17,7 @@ class ImagesController < ApplicationController
     @image = @article.images.new(image_params)
 
     if @image.save
-      redirect_to article_url(@article), notice: 'Image was successfully created.'
+      redirect_to article_url(@article), notice: '画像を追加しました。'
     else
       render :new
     end
@@ -29,7 +29,7 @@ class ImagesController < ApplicationController
     @image = @article.images.find(params[:id])
 
     if @image.update(image_params)
-      redirect_to article_url(@article), notice: 'Image was successfully updated.'
+      redirect_to article_url(@article), notice: '画像を更新しました。'
     else
       render :edit
     end
@@ -40,7 +40,7 @@ class ImagesController < ApplicationController
     @article = Article.find(params[:article_id])
     @image = @article.images.find(params[:id])
     @image.destroy
-    redirect_to article_url(@article), notice: 'Image was successfully destroyed.'
+    redirect_to article_url(@article), notice: '画像を削除しました。'
   end
 
   private

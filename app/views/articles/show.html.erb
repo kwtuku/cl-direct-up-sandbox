@@ -1,21 +1,19 @@
-<%= link_to 'Edit', edit_article_path(@article) %> |
-<%= link_to 'Destroy', @article, method: :delete, data: { confirm: 'Are you sure?' } %> |
-<%= link_to 'New Image', new_article_image_path(@article) %>
+<div class="field has-addons">
+  <p class="control">
+    <%= link_to '編集', edit_article_path(@article), class: 'button' %>
+  </p>
+  <p class="control">
+    <%= link_to '削除', @article, method: :delete, data: { confirm: 'Are you sure?' }, class: 'button' %>
+  </p>
+  <p class="control">
+    <%= link_to '画像を追加', new_article_image_path(@article), class: 'button' %>
+  </p>
+</div>
 
-<p>
-  <strong>Title:</strong>
-  <%= @article.title %>
-</p>
-
-<p>
-  <strong>Body:</strong>
-  <%= @article.body %>
-</p>
-
-<p>
-  <strong>Images:</strong>
-  <%= 'No image' if @article.images.blank? %>
-</p>
+<div class="content">
+  <h1 class="title"><%= @article.title %></h1>
+  <%= simple_format h(@article.body) %>
+</div>
 
 <div class="columns is-multiline">
   <% @article.images.each do |image| %>
@@ -26,10 +24,10 @@
             <%= cl_image_tag image.cl_id, width: 500, height: 500, crop: :fill %>
           </figure>
         </div>
-        <div class="card-content">
-          <%= link_to 'Edit', edit_article_image_path(@article, image) %> |
-          <%= link_to 'Destroy', article_image_path(@article, image), method: :delete, data: { confirm: 'Are you sure?' } %>
-        </div>
+        <footer class="card-footer">
+          <%= link_to '編集', edit_article_image_path(@article, image), class: 'card-footer-item' %>
+          <%= link_to '削除', article_image_path(@article, image), method: :delete, data: { confirm: '本当に画像を削除しますか？' }, class: 'card-footer-item' %>
+        </footer>
       </div>
     </div>
   <% end %>

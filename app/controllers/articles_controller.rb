@@ -24,7 +24,7 @@ class ArticlesController < ApplicationController
     @article_form = ArticleForm.new(article_params)
 
     if @article_form.save
-      redirect_to @article_form, notice: 'Article was successfully created.'
+      redirect_to @article_form, notice: '記事を作成しました。'
     else
       render :new
     end
@@ -35,7 +35,7 @@ class ArticlesController < ApplicationController
     @article_form = ArticleForm.new(article_params, article: @article)
 
     if @article_form.save
-      redirect_to @article_form, notice: 'Article was successfully updated.'
+      redirect_to @article_form, notice: '記事を更新しました。'
     else
       render :edit
     end
@@ -44,7 +44,7 @@ class ArticlesController < ApplicationController
   # DELETE /articles/1
   def destroy
     @article.destroy
-    redirect_to articles_url, notice: 'Article was successfully destroyed.'
+    redirect_to articles_url, notice: '記事を削除しました。'
   end
 
   private

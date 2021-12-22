@@ -1,3 +1,3 @@
-<h1 class="title">New Image of <%= link_to "Article #{@article.id}", article_path(@article) %></h1>
+<h1 class="title"><%= link_to @article.title, article_path(@article) %>の画像を追加</h1>
 
 <%= render 'form', article: @article, image: @image %>

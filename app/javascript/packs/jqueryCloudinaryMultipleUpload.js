@@ -8,26 +8,30 @@ $(document).ready(function () {
     .cloudinary_fileupload({
       acceptFileTypes: /(\.|\/)(jpe?g|png|webp)$/i,
       maxFileSize: 2000000,
+      messages: {
+        acceptFileTypes: 'jpg, jpeg, png, webpファイルのみがアップロードできます',
+        maxFileSize: '2MB以下のファイルがアップロードできます',
+      },
       dropZone: "#drop-zone",
       processalways: function (e, data) {
         if (data.files.error) alert(data.files[0].error);
       },
       start: function (e) {
         fileuploadStatus.removeClass("is-hidden");
-        fileuploadMessage.text("Starting upload...");
+        fileuploadMessage.text("アップロードを開始...");
       },
       progressall: function (e, data) {
         let progressAllValue = Math.round((data.loaded * 100.0) / data.total);
 
         fileuploadProgress.val(progressAllValue);
-        fileuploadMessage.text(`Uploading... ${progressAllValue}%`);
+        fileuploadMessage.text(`アップロード中... ${progressAllValue}%`);
         if (progressAllValue === 100) {
           fileuploadStatus.addClass("is-hidden");
           fileuploadProgress.val("0");
         }
       },
       fail: function (e, data) {
-        alert("Upload failed");
+        alert("アップロードに失敗しました");
       }
     })
     .off("cloudinarydone").on("cloudinarydone", function (e, data) {
@@ -50,7 +54,7 @@ $(document).ready(function () {
             preview.remove();
             $(`input[value*="${publicId}"]`).remove();
           }).fail(function () {
-            alert("Cannot delete image");
+            alert("画像が削除できません");
           });
         });
     });

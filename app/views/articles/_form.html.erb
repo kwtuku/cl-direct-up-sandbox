@@ -5,7 +5,7 @@
     <% end %>
 
     <div class="message is-danger" id="error_explanation">
-      <h2 class="message-header"><%= pluralize(article_form.errors.count, "error") %> prohibited this article from being saved:</h2>
+      <h2 class="message-header"><%= article_form.errors.count %>件のエラーが発生したため記事は保存されませんでした</h2>
 
       <ul class="message-body">
         <% article_form.errors.each do |error| %>
@@ -30,7 +30,7 @@
   </div>
 
   <div class="field">
-    <%= form.label :cl_ids, class: 'label' %>
+    <%= form.label :cl_ids, '画像', class: 'label' %>
     <div class="columns is-multiline is-centered" id="cloudinary-fileupload-previews">
       <% article&.images&.each do |image| %>
         <div class="column is-one-fifth is-flex">
@@ -54,15 +54,15 @@
     </div>
     <div class="control">
       <div class="box has-text-centered has-background-light p-6" id="drop-zone">
-        <p class="block">Drag and drop assets here</p>
-        <p class="block">or</p>
+        <p class="block">ドラッグ＆ドロップ</p>
+        <p class="block">または</p>
 
         <div class="file is-primary is-inline-flex is-justify-content-center block">
           <label class="file-label">
             <%= form.cl_image_upload :cl_ids, return_delete_token: true, html: { class: 'file-input', accept: 'image/jpg, image/jpeg, image/png, image/webp', multiple: true, data: { cloudinary_field: 'article[cl_ids][]' } } %>
             <span class="file-cta">
               <span class="file-label">
-                Choose a file…
+                画像を選択する
               </span>
             </span>
           </label>
