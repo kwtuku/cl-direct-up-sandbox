@@ -7,7 +7,8 @@ class ArticleForm
 
   validates :title, presence: true
   validates :body, presence: true
-  validate :validate_image_count
+  validate :validate_max_image_count
+  validate :validate_min_image_count
 
   def initialize(attributes = nil, article: Article.new)
     @article = article
@@ -45,11 +46,20 @@ class ArticleForm
   end
 
   IMAGE_MAX_COUNT = 10
-  def validate_image_count
+  def validate_max_image_count
     return unless cl_ids
 
     return if (article.images.size + cl_ids.size) <= IMAGE_MAX_COUNT
 
     errors.add(:base, :too_many_images, message: "記事の画像は#{IMAGE_MAX_COUNT}枚以下にしてください")
+  end
+
+  IMAGE_MIN_COUNT = 1
+  def validate_min_image_count
+    return unless cl_ids.nil?
+
+    return if article.images.exists?
+
+    errors.add(:base, :require_images, message: "記事には画像が#{IMAGE_MIN_COUNT}枚以上必要です")
   end
 end

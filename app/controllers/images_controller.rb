@@ -37,10 +37,13 @@ class ImagesController < ApplicationController
 
   # DELETE /articles/1/images/1
   def destroy
-    @article = Article.find(params[:article_id])
-    @image = @article.images.find(params[:id])
-    @image.destroy
-    redirect_to article_url(@article), notice: '画像を削除しました。'
+    article = Article.find(params[:article_id])
+    image = article.images.find(params[:id])
+    if image.destroy
+      redirect_to article_url(article), notice: '画像を削除しました。'
+    else
+      redirect_to article_url(article), alert: "画像を削除できません。#{image.errors.map(&:full_message).join('。')}"
+    end
   end
 
   private

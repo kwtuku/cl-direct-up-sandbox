@@ -13,7 +13,7 @@ RSpec.describe ArticleForm, type: :model do
           expect(article_form.save).to be_falsey
         end
 
-        it 'has the error' do
+        it 'has the error of title blank' do
           article_form.save
           expect(article_form.errors).to be_of_kind(:title, :blank)
         end
@@ -33,7 +33,7 @@ RSpec.describe ArticleForm, type: :model do
           expect(article_form.save).to be_falsey
         end
 
-        it 'has the error' do
+        it 'has the error of body blank' do
           article_form.save
           expect(article_form.errors).to be_of_kind(:body, :blank)
         end
@@ -49,12 +49,17 @@ RSpec.describe ArticleForm, type: :model do
           described_class.new(attributes, article: Article.new)
         end
 
-        it 'returns true' do
-          expect(article_form.save).to be_truthy
+        it 'returns false' do
+          expect(article_form.save).to be_falsey
         end
 
-        it 'increases article count by 1' do
-          expect { article_form.save }.to change(Article, :count).by(1)
+        it 'has the error of require_images' do
+          article_form.save
+          expect(article_form.errors).to be_of_kind(:base, :require_images)
+        end
+
+        it 'does not increase article count' do
+          expect { article_form.save }.to change(Article, :count).by(0)
         end
 
         it 'does not increase image count' do
@@ -124,7 +129,7 @@ RSpec.describe ArticleForm, type: :model do
           expect(article_form.save).to be_falsey
         end
 
-        it 'has the error' do
+        it 'has the error of too_many_images' do
           article_form.save
           expect(article_form.errors).to be_of_kind(:base, :too_many_images)
         end
@@ -223,7 +228,7 @@ RSpec.describe ArticleForm, type: :model do
           expect(article_form.save).to be_falsey
         end
 
-        it 'has the error' do
+        it 'has the error of too_many_images' do
           article_form.save
           expect(article_form.errors).to be_of_kind(:base, :too_many_images)
         end
@@ -297,7 +302,7 @@ RSpec.describe ArticleForm, type: :model do
           expect(article_form.save).to be_falsey
         end
 
-        it 'has the error' do
+        it 'has the error of too_many_images' do
           article_form.save
           expect(article_form.errors).to be_of_kind(:base, :too_many_images)
         end
@@ -346,7 +351,7 @@ RSpec.describe ArticleForm, type: :model do
           expect(article_form.save).to be_falsey
         end
 
-        it 'has the error' do
+        it 'has the error of too_many_images' do
           article_form.save
           expect(article_form.errors).to be_of_kind(:base, :too_many_images)
         end
@@ -364,13 +369,7 @@ RSpec.describe ArticleForm, type: :model do
     context 'when article and images are invalid' do
       context 'when new arcitle' do
         let(:article_form) do
-          images = []
-          11.times do
-            example_image = Rails.root.join("spec/fixtures/files/example.#{%w[jpg jpeg png webp].sample}")
-            images << Rack::Test::UploadedFile.new(example_image)
-          end
-          cl_ids = { cl_ids: images }
-          attributes = attributes_for(:article, title: nil).merge(cl_ids)
+          attributes = attributes_for(:article, title: nil)
           described_class.new(attributes, article: Article.new)
         end
 
@@ -381,7 +380,7 @@ RSpec.describe ArticleForm, type: :model do
         it 'has article error and image error' do
           article_form.save
           expect(article_form.errors).to be_of_kind(:title, :blank)
-          expect(article_form.errors).to be_of_kind(:base, :too_many_images)
+          expect(article_form.errors).to be_of_kind(:base, :require_images)
         end
       end
 

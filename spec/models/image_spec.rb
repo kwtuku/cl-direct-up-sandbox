@@ -1,7 +1,7 @@
 require 'rails_helper'
 
 RSpec.describe Image, type: :model do
-  describe 'validations' do
+  describe 'validate_max_image_count' do
     let(:example_image) { Rails.root.join("spec/fixtures/files/example.#{%w[jpg jpeg png webp].sample}") }
 
     context 'when the article does not have images' do
@@ -35,6 +35,21 @@ RSpec.describe Image, type: :model do
         expect(image).to be_invalid
         expect(image.errors).to be_of_kind(:base, :too_many_images)
       end
+    end
+  end
+
+  describe 'validate_min_image_count' do
+    let!(:image) { create(:image) }
+
+    it 'does not decrease image count' do
+      expect do
+        image.destroy
+      end.to change(described_class, :count).by(0)
+    end
+
+    it 'has the error of require_images' do
+      image.destroy
+      expect(image.errors).to be_of_kind(:base, :require_images)
     end
   end
 end
