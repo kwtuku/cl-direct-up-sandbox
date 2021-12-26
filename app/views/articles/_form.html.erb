@@ -1,0 +1,92 @@
+<%= form_with(model: article_form, class: 'box') do |form| %>
+  <% if article_form.errors.any? %>
+    <% article_form.cl_ids&.each do |cl_id| %>
+      <%= form.hidden_field :cl_ids, name: 'article[cl_ids][]', value: cl_id %>
+    <% end %>
+
+    <div class="message is-danger" id="error_explanation">
+      <h2 class="message-header"><%= article_form.errors.count %>件のエラーが発生したため記事は保存されませんでした</h2>
+
+      <ul class="message-body">
+        <% article_form.errors.each do |error| %>
+          <li><%= error.full_message %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div class="field">
+    <%= form.label :title, class: 'label' %>
+    <div class="control">
+      <%= form.text_field :title, class: 'input' %>
+    </div>
+  </div>
+
+  <div class="field">
+    <%= form.label :body, class: 'label' %>
+    <div class="control">
+      <%= form.text_area :body, class: 'textarea' %>
+    </div>
+  </div>
+
+  <div class="field">
+    <%= form.label :cl_ids, '画像', class: 'label' %>
+    <div class="columns is-multiline is-centered" id="cloudinary-fileupload-previews">
+      <% article&.images&.each do |image| %>
+        <div class="column is-one-fifth is-flex">
+          <figure>
+            <%= cl_image_tag image.cl_id, width: 500, height: 500, crop: :fill %>
+          </figure>
+          <button type="button" class="delete is-medium js-delete-image-button" data-article-id="<%= article.id %>" data-image-id="<%= image.id %>"></button>
+        </div>
+      <% end %>
+
+      <% if article_form.errors.any? %>
+        <% article_form.cl_ids&.each do |cl_id| %>
+          <div class="column is-one-fifth is-flex">
+            <figure>
+              <%= cl_image_tag cl_id.split('#')[0].split('/')[3], width: 500, height: 500, crop: :fill %>
+            </figure>
+            <button type="button" class="delete is-medium js-delete-image-cache-button" data-public-id="<%= cl_id.split('#')[0].split('/')[3].split('.')[0] %>"></button>
+          </div>
+        <% end %>
+      <% end %>
+    </div>
+    <div class="control">
+      <div class="box has-text-centered has-background-light p-6" id="drop-zone">
+        <p class="block">ドラッグ＆ドロップ</p>
+        <p class="block">または</p>
+
+        <div class="file is-primary is-inline-flex is-justify-content-center block">
+          <label class="file-label">
+            <%= form.cl_image_upload :cl_ids, return_delete_token: true, html: { class: 'file-input', accept: 'image/jpg, image/jpeg, image/png, image/webp', multiple: true, data: { cloudinary_field: 'article[cl_ids][]' } } %>
+            <span class="file-cta">
+              <span class="file-label">
+                画像を選択する
+              </span>
+            </span>
+          </label>
+        </div>
+
+        <div class="is-hidden block" id="cloudinary-fileupload-status">
+          <progress class="progress is-primary" value="0" max="100" id="cloudinary-fileupload-progress"></progress>
+          <span id="cloudinary-fileupload-message"></span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="field is-grouped">
+    <div class="control">
+      <%= form.submit class: 'button is-primary' %>
+    </div>
+    <div class="control">
+      <%= link_to 'キャンセル', (article.present? ? article_path(article) : articles_path), class: 'button is-light' %>
+    </div>
+  </div>
+<% end %>
+
+<%= cloudinary_js_config %>
+<%= javascript_pack_tag 'jqueryCloudinaryMultipleUpload', 'data-turbolinks-track': 'reload' %>
+<%= javascript_pack_tag 'removeImage', 'data-turbolinks-track': 'reload' %>
+<%= javascript_pack_tag 'removeImageCache', 'data-turbolinks-track': 'reload' %>

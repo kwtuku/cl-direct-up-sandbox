@@ -1,16 +1,56 @@
 <!DOCTYPE html>
-<html>
+<html lang="ja">
   <head>
-    <title>Myapp</title>
+    <title>Cloudinary direct upload sandbox</title>
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <%= csrf_meta_tags %>
     <%= csp_meta_tag %>
 
     <%= stylesheet_link_tag 'application', media: 'all', 'data-turbolinks-track': 'reload' %>
     <%= javascript_pack_tag 'application', 'data-turbolinks-track': 'reload' %>
+    <%= javascript_include_tag "application" %>
   </head>
 
   <body>
-    <%= yield %>
+    <header>
+      <nav class="navbar has-shadow" role="navigation" aria-label="main navigation">
+        <div class="container">
+          <div class="navbar-brand">
+            <%= link_to 'トップ', root_path, class: 'navbar-item' %>
+            <%= link_to 'アカウント編集', edit_user_registration_path, class: 'navbar-item' if user_signed_in? %>
+            <div class="navbar-item">
+              <div class="buttons">
+                <%= link_to '記事を作成', new_article_path, class: 'button is-primary' %>
+                <% if user_signed_in? %>
+                  <%= link_to 'ログアウト', destroy_user_session_path, method: :delete, class: 'button is-light' %>
+                <% else %>
+                  <%= link_to 'ログイン', new_user_session_path, class: 'button is-primary is-light' %>
+                  <%= link_to 'アカウント登録', new_user_registration_path, class: 'button is-light' %>
+                <% end %>
+              </div>
+            </div>
+          </div>
+        </div>
+      </nav>
+    </header>
+
+    <% if flash[:notice] %>
+      <div class="notification is-primary">
+        <p><%= notice %></p>
+      </div>
+    <% end %>
+    <% if flash[:alert] %>
+      <div class="notification is-danger">
+        <p><%= alert %></p>
+      </div>
+    <% end %>
+
+    <main>
+      <div class="container">
+        <section class="section">
+          <%= yield %>
+        </section>
+      </div>
+    </main>
   </body>
 </html>

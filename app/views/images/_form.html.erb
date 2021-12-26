@@ -1,0 +1,68 @@
+<%= form_with(model: [article, image], class: 'box') do |form| %>
+  <%= form.hidden_field :cl_id, name: 'image[cl_id]', value: image.cl_id.cache_name %>
+
+  <% if image.errors.any? %>
+    <div class="message is-danger"id="error_explanation">
+      <h2 class="message-header"><%= image.errors.count%>件のエラーが発生したため画像は保存されませんでした</h2>
+
+      <ul class="message-body">
+        <% image.errors.each do |error| %>
+          <li><%= error.full_message %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div class="field">
+    <%= form.label :cl_id, '画像', class: 'label' %>
+    <div class="columns is-multiline is-centered" id="cloudinary-fileupload-preview">
+      <% if image.cl_id.present? %>
+        <div class="column is-one-fifth is-flex" id="current-image">
+          <figure>
+            <%= cl_image_tag image.cl_id, width: 500, height: 500, crop: :fill %>
+          </figure>
+          <% if image.errors.any? %>
+            <button type="button" class="delete is-medium js-delete-image-cache-button" data-public-id="<%= image.cl_id.my_public_id %>"></button>
+          <% else %>
+            <%= link_to '削除', article_image_path(article, image), method: :delete, data: { confirm: '本当に画像を削除しますか？' }, class: 'delete is-medium' %>
+          <% end %>
+        </div>
+      <% end %>
+    </div>
+    <div class="control">
+      <div class="box has-text-centered has-background-light p-6" id="drop-zone">
+        <p class="block">ドラッグ＆ドロップ</p>
+        <p class="block">または</p>
+
+        <div class="file is-primary is-inline-flex is-justify-content-center block">
+          <label class="file-label">
+            <%= form.cl_image_upload :cl_id, return_delete_token: true, html: { class: 'file-input', accept: 'image/jpg, image/jpeg, image/png, image/webp' } %>
+            <span class="file-cta">
+              <span class="file-label">
+                画像を選択する
+              </span>
+            </span>
+          </label>
+        </div>
+
+        <div class="is-hidden block" id="cloudinary-fileupload-status">
+          <progress class="progress is-primary" value="0" max="100" id="cloudinary-fileupload-progress"></progress>
+          <span id="cloudinary-fileupload-message"></span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="field is-grouped">
+    <div class="control">
+      <%= form.submit class: 'button is-primary' %>
+    </div>
+    <div class="control">
+      <%= link_to 'キャンセル', article_path(article), class: 'button is-light' %>
+    </div>
+  </div>
+<% end %>
+
+<%= cloudinary_js_config %>
+<%= javascript_pack_tag 'jqueryCloudinaryUpload', 'data-turbolinks-track': 'reload' %>
+<%= javascript_pack_tag 'removeImageCache', 'data-turbolinks-track': 'reload' %>

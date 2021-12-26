@@ -1,1 +1,16 @@
 ja:
+  activemodel:
+    attributes:
+      article_form:
+        body: 本文
+        title: タイトル
+  activerecord:
+    attributes:
+      article:
+        body: 本文
+        title: タイトル
+      image:
+        cl_id: 画像
+    models:
+      article: 記事
+      image: 画像

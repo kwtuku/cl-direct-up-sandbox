@@ -1,3 +1,18 @@
 Rails.application.routes.draw do
-  # For details on the DSL available within this file, see https://guides.rubyonrails.org/routing.html
+  devise_for :users
+
+  root to: 'articles#index'
+
+  namespace :api, format: 'json' do
+    namespace :v0 do
+      resources :articles, only: %i[] do
+        resources :images, only: %i[destroy]
+      end
+      resources :admin_cloudinary, only: %i[destroy]
+    end
+  end
+
+  resources :articles do
+    resources :images, only: %i[new create edit update destroy]
+  end
 end
