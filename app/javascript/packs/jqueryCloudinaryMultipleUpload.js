@@ -42,6 +42,8 @@ $(document).ready(function () {
         format: data.result.format, width: 500, height: 500, crop: "fill"
       }).appendTo($("<figure>").appendTo(preview));
 
+      $(`input[value*="${publicId}"]`).attr('name', `article[image_attributes][${new Date().valueOf()}][cl_id]`);
+
       $("<a/>").
         addClass("delete_by_token delete is-medium").
         attr({ href: "#" }).
