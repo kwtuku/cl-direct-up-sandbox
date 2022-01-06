@@ -3,6 +3,8 @@ $(document).ready(function () {
   const fileuploadStatus = $("#cloudinary-fileupload-status");
   const fileuploadProgress = $("#cloudinary-fileupload-progress");
   const fileuploadMessage = $("#cloudinary-fileupload-message");
+  let uploadingFilesCounter = 0;
+  let displayedValidationErrorMessages = [];
 
   $(".cloudinary-fileupload")
     .cloudinary_fileupload({
@@ -14,7 +16,19 @@ $(document).ready(function () {
       },
       dropZone: "#drop-zone",
       processalways: function (e, data) {
-        if (data.files.error) alert(data.files[0].error);
+        const errorMessage = data.files[0].error;
+
+        if (data.files.error && displayedValidationErrorMessages.indexOf(errorMessage) === -1) {
+          alert(errorMessage);
+          displayedValidationErrorMessages.push(errorMessage);
+        }
+
+        uploadingFilesCounter++;
+
+        if (uploadingFilesCounter === data.originalFiles.length) {
+          displayedValidationErrorMessages = [];
+          uploadingFilesCounter = 0;
+        }
       },
       start: function (e) {
         fileuploadStatus.removeClass("is-hidden");
