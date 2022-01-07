@@ -3,18 +3,29 @@ $(document).ready(function () {
   const fileuploadStatus = $("#cloudinary-fileupload-status");
   const fileuploadProgress = $("#cloudinary-fileupload-progress");
   const fileuploadMessage = $("#cloudinary-fileupload-message");
-  let uploadingFilesCounter = 0;
+  const maxNumberOfFiles = 10;
   let displayedValidationErrorMessages = [];
+  let processedFilesCounter = 0;
+  let uploadedFilesCounter = 0;
 
   $(".cloudinary-fileupload")
     .cloudinary_fileupload({
       acceptFileTypes: /(\.|\/)(jpe?g|png|webp)$/i,
       maxFileSize: 2000000,
+      getNumberOfFiles: function () { return uploadedFilesCounter; },
+      maxNumberOfFiles: maxNumberOfFiles,
       messages: {
         acceptFileTypes: 'jpg, jpeg, png, webpファイルのみがアップロードできます',
         maxFileSize: '2MB以下のファイルがアップロードできます',
+        maxNumberOfFiles: `画像は最大で${maxNumberOfFiles}枚までアップロードできます`
       },
       dropZone: "#drop-zone",
+      change: function (e, data) {
+        if (data.files.length > maxNumberOfFiles) {
+          alert(`画像は最大で${maxNumberOfFiles}枚までアップロードできます`);
+          return false;
+        }
+      },
       processalways: function (e, data) {
         const errorMessage = data.files[0].error;
 
@@ -23,11 +34,15 @@ $(document).ready(function () {
           displayedValidationErrorMessages.push(errorMessage);
         }
 
-        uploadingFilesCounter++;
+        if (!data.files.error) {
+          uploadedFilesCounter++;
+        }
 
-        if (uploadingFilesCounter === data.originalFiles.length) {
+        processedFilesCounter++;
+
+        if (processedFilesCounter === data.originalFiles.length) {
           displayedValidationErrorMessages = [];
-          uploadingFilesCounter = 0;
+          processedFilesCounter = 0;
         }
       },
       start: function (e) {
@@ -69,6 +84,8 @@ $(document).ready(function () {
           $.cloudinary.delete_by_token($(this).data("delete_token")).done(function () {
             preview.remove();
             $(`input[value*="${publicId}"]`).remove();
+
+            uploadedFilesCounter--;
           }).fail(function () {
             alert("画像が削除できません");
           });
