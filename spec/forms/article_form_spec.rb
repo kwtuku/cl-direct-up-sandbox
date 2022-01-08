@@ -1,6 +1,135 @@
 require 'rails_helper'
 
 RSpec.describe ArticleForm, type: :model do
+  describe '#new_cl_ids' do
+    context 'when new article and image_attributes does not have cl_id' do
+      it 'returns []' do
+        attributes = attributes_for(:article)
+        article_form = described_class.new(attributes, article: Article.new)
+        expect(article_form.new_cl_ids).to eq []
+      end
+    end
+
+    context 'when new article and image_attributes has a cl_id' do
+      it 'returns an array of cl_id' do
+        example_image_path = Rails.root.join("spec/fixtures/files/example.#{%w[jpg jpeg png webp].sample}")
+        image_attributes = { Time.now.to_i.to_s => { 'cl_id' => example_image_path } }
+        attributes = attributes_for(:article)
+        attributes[:image_attributes] = image_attributes
+        article_form = described_class.new(attributes, article: Article.new)
+        expect(article_form.new_cl_ids).to eq [example_image_path]
+      end
+    end
+
+    context 'when new article and image_attributes has 2 cl_id' do
+      it 'returns an array of cl_ids' do
+        image_attributes = {}
+        example_image_paths = []
+        2.times do
+          example_image_path = Rails.root.join("spec/fixtures/files/example.#{%w[jpg jpeg png webp].sample}")
+          random_number = SecureRandom.random_number(1 << 64)
+          image_attributes[random_number] = { 'cl_id' => example_image_path }
+          example_image_paths << example_image_path
+        end
+        attributes = attributes_for(:article)
+        attributes[:image_attributes] = image_attributes
+        article_form = described_class.new(attributes, article: Article.new)
+        expect(article_form.new_cl_ids).to eq example_image_paths
+      end
+    end
+
+    context 'when an article exists and image_attributes does not have cl_id' do
+      it 'returns []' do
+        attributes = attributes_for(:article)
+        article_form = described_class.new(attributes, article: create(:article, :with_an_image))
+        expect(article_form.new_cl_ids).to eq []
+      end
+    end
+
+    context 'when an article exists and image_attributes has a cl_id' do
+      it 'returns an array of cl_id' do
+        example_image_path = Rails.root.join("spec/fixtures/files/example.#{%w[jpg jpeg png webp].sample}")
+        image_attributes = { Time.now.to_i.to_s => { 'cl_id' => example_image_path } }
+        attributes = attributes_for(:article)
+        attributes[:image_attributes] = image_attributes
+        article_form = described_class.new(attributes, article: create(:article))
+        expect(article_form.new_cl_ids).to eq [example_image_path]
+      end
+    end
+
+    context 'when article exists and image_attributes has 2 cl_id' do
+      it 'returns an array of cl_ids' do
+        image_attributes = {}
+        example_image_paths = []
+        2.times do
+          example_image_path = Rails.root.join("spec/fixtures/files/example.#{%w[jpg jpeg png webp].sample}")
+          random_number = SecureRandom.random_number(1 << 64)
+          image_attributes[random_number] = { 'cl_id' => example_image_path }
+          example_image_paths << example_image_path
+        end
+        attributes = attributes_for(:article)
+        attributes[:image_attributes] = image_attributes
+        article_form = described_class.new(attributes, article: create(:article))
+        expect(article_form.new_cl_ids).to eq example_image_paths
+      end
+    end
+  end
+
+  describe '#destroying_image_ids' do
+    context 'when new article and image_attributes is nil' do
+      it 'returns []' do
+        attributes = attributes_for(:article)
+        article_form = described_class.new(attributes, article: Article.new)
+        expect(article_form.destroying_image_ids).to eq []
+      end
+    end
+
+    context 'when new article and image_attributes has a cl_id' do
+      it 'returns []' do
+        example_image = Rails.root.join("spec/fixtures/files/example.#{%w[jpg jpeg png webp].sample}")
+        image_attributes = { Time.now.to_i.to_s => { 'cl_id' => Rack::Test::UploadedFile.new(example_image) } }
+        attributes = attributes_for(:article)
+        attributes[:image_attributes] = image_attributes
+        article_form = described_class.new(attributes, article: Article.new)
+        expect(article_form.destroying_image_ids).to eq []
+      end
+    end
+
+    context 'when an article exists and image_attributes does not have _destroy true' do
+      it 'returns []' do
+        article = create(:article)
+        create_list(:image, 3, article: article)
+        attributes = attributes_for(:article)
+        article_form = described_class.new(attributes, article: article)
+        expect(article_form.destroying_image_ids).to eq []
+      end
+    end
+
+    context 'when an article exists and image_attributes has _destroy true' do
+      let(:article) { create(:article) }
+      let(:images) { create_list(:image, 3, article: article) }
+
+      it 'returns an array of destroying_image_id' do
+        destroying_image = images.sample
+        attributes = {
+          image_attributes: { destroying_image.id => { 'id' => destroying_image.id, '_destroy' => 'true' } }
+        }
+        article_form = described_class.new(attributes, article: article)
+        expect(article_form.destroying_image_ids).to eq [destroying_image.id]
+      end
+
+      it 'returns an array of destroying_image_ids' do
+        destroying_images = images.sample(2)
+        image_attributes = {}
+        destroying_images.each { |image| image_attributes[image.id] = { 'id' => image.id, '_destroy' => 'true' } }
+        attributes = {}
+        attributes[:image_attributes] = image_attributes
+        article_form = described_class.new(attributes, article: article)
+        expect(article_form.destroying_image_ids).to eq destroying_images.map(&:id)
+      end
+    end
+  end
+
   describe '#save' do
     context 'when new article' do
       context 'when title is blank' do
