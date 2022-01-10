@@ -8,7 +8,7 @@ RSpec.describe ArticleForm, type: :model do
   end
 
   describe '#new_cl_ids' do
-    context 'when new article and image_attributes does not have cl_id' do
+    context 'when new article with no images' do
       it 'returns []' do
         attributes = { **attributes_for(:article), image_attributes: nil }
         article_form = described_class.new(attributes, article: Article.new)
@@ -16,7 +16,7 @@ RSpec.describe ArticleForm, type: :model do
       end
     end
 
-    context 'when new article and image_attributes has a cl_id' do
+    context 'when new article with 1 image' do
       it 'returns an array of cl_id' do
         example_image_path = Rails.root.join("spec/fixtures/files/example.#{%w[jpg jpeg png webp].sample}")
         image_attributes = { Time.now.to_i.to_s => { 'cl_id' => example_image_path } }
@@ -26,7 +26,7 @@ RSpec.describe ArticleForm, type: :model do
       end
     end
 
-    context 'when new article and image_attributes has 2 cl_id' do
+    context 'when new article with 2 image' do
       it 'returns an array of cl_ids' do
         image_attributes = {}
         example_image_paths = []
@@ -42,7 +42,7 @@ RSpec.describe ArticleForm, type: :model do
       end
     end
 
-    context 'when an article exists and image_attributes does not have cl_id' do
+    context 'when an article exists without adding images' do
       it 'returns []' do
         existing_article = create(:article, :with_an_image)
         image_attributes = create_image_attributes(existing_article)
@@ -52,7 +52,7 @@ RSpec.describe ArticleForm, type: :model do
       end
     end
 
-    context 'when an article exists and image_attributes has a cl_id' do
+    context 'when an article exists and adding 1 image' do
       it 'returns an array of cl_id' do
         existing_article = create(:article, :with_an_image)
         image_attributes = create_image_attributes(existing_article)
@@ -64,7 +64,7 @@ RSpec.describe ArticleForm, type: :model do
       end
     end
 
-    context 'when article exists and image_attributes has 2 cl_id' do
+    context 'when article exists and adding 2 images' do
       it 'returns an array of cl_ids' do
         existing_article = create(:article, :with_an_image)
         image_attributes = create_image_attributes(existing_article)
@@ -83,7 +83,7 @@ RSpec.describe ArticleForm, type: :model do
   end
 
   describe '#destroying_image_ids' do
-    context 'when new article and image_attributes is nil' do
+    context 'when new article with no images' do
       it 'returns []' do
         attributes = { **attributes_for(:article), image_attributes: nil }
         article_form = described_class.new(attributes, article: Article.new)
@@ -91,7 +91,7 @@ RSpec.describe ArticleForm, type: :model do
       end
     end
 
-    context 'when new article and image_attributes has a cl_id' do
+    context 'when new article and adding an image' do
       it 'returns []' do
         example_image = Rails.root.join("spec/fixtures/files/example.#{%w[jpg jpeg png webp].sample}")
         image_attributes = { Time.now.to_i.to_s => { 'cl_id' => Rack::Test::UploadedFile.new(example_image) } }
@@ -101,7 +101,7 @@ RSpec.describe ArticleForm, type: :model do
       end
     end
 
-    context 'when an article exists and image_attributes does not have _destroy true' do
+    context 'when an article exists without destroying images' do
       it 'returns []' do
         existing_article = create(:article, :with_an_image)
         image_attributes = create_image_attributes(existing_article)
@@ -111,7 +111,7 @@ RSpec.describe ArticleForm, type: :model do
       end
     end
 
-    context 'when an article exists and image_attributes has _destroy true' do
+    context 'when an article exists and destroying images' do
       let(:existing_article) { create(:article, :with_3_images) }
 
       it 'returns an array of destroying_image_id' do
@@ -135,7 +135,7 @@ RSpec.describe ArticleForm, type: :model do
   end
 
   describe '#save' do
-    context 'when new article and title is blank' do
+    context 'when new article with blank title' do
       let(:article_form) do
         attributes = attributes_for(:article, title: nil)
         described_class.new(attributes, article: Article.new)
@@ -155,7 +155,7 @@ RSpec.describe ArticleForm, type: :model do
       end
     end
 
-    context 'when new article and body is blank' do
+    context 'when new article with blank body' do
       let(:article_form) do
         attributes = attributes_for(:article, body: nil)
         described_class.new(attributes, article: Article.new)
@@ -175,7 +175,7 @@ RSpec.describe ArticleForm, type: :model do
       end
     end
 
-    context 'when new article and image_attributes cl_id is blank' do
+    context 'when new article with no images' do
       let(:article_form) do
         attributes = { **attributes_for(:article), image_attributes: nil }
         described_class.new(attributes, article: Article.new)
@@ -199,7 +199,7 @@ RSpec.describe ArticleForm, type: :model do
       end
     end
 
-    context 'when new article and image_attributes cl_id count is 1' do
+    context 'when new article with 1 image' do
       let(:article_form) do
         example_image = Rails.root.join("spec/fixtures/files/example.#{%w[jpg jpeg png webp].sample}")
         image_attributes = { Time.now.to_i.to_s => { 'cl_id' => Rack::Test::UploadedFile.new(example_image) } }
@@ -220,7 +220,7 @@ RSpec.describe ArticleForm, type: :model do
       end
     end
 
-    context 'when new article and image_attributes cl_id count is 10' do
+    context 'when new article with 10 images' do
       let(:article_form) do
         image_attributes = {}
         10.times do
@@ -245,7 +245,7 @@ RSpec.describe ArticleForm, type: :model do
       end
     end
 
-    context 'when new article and image_attributes cl_id count is 11' do
+    context 'when new article with 11 images' do
       let(:article_form) do
         image_attributes = {}
         11.times do
@@ -275,9 +275,9 @@ RSpec.describe ArticleForm, type: :model do
       end
     end
 
-    context 'when an article exists with an image and image_attributes cl_id is blank' do
+    context 'when an article exists with 1 image without adding images' do
+      let!(:existing_article) { create(:article, :with_an_image) }
       let(:article_form) do
-        existing_article = create(:article, :with_an_image)
         image_attributes = create_image_attributes(existing_article)
         attributes = { **attributes_for(:article), image_attributes: image_attributes }
         described_class.new(attributes, article: existing_article)
@@ -296,9 +296,9 @@ RSpec.describe ArticleForm, type: :model do
       end
     end
 
-    context 'when an article exists with an image and image_attributes cl_id count is 1' do
+    context 'when an article exists with 1 image and adding 1 image' do
+      let!(:existing_article) { create(:article, :with_an_image) }
       let(:article_form) do
-        existing_article = create(:article, :with_an_image)
         image_attributes = create_image_attributes(existing_article)
         example_image = Rails.root.join("spec/fixtures/files/example.#{%w[jpg jpeg png webp].sample}")
         image_attributes[Time.now.to_i.to_s] = { 'cl_id' => Rack::Test::UploadedFile.new(example_image) }
@@ -319,9 +319,9 @@ RSpec.describe ArticleForm, type: :model do
       end
     end
 
-    context 'when an article exists with an image and image_attributes cl_id count is 9' do
+    context 'when an article exists with 1 image and adding 9 images' do
+      let!(:existing_article) { create(:article, :with_an_image) }
       let(:article_form) do
-        existing_article = create(:article, :with_an_image)
         image_attributes = create_image_attributes(existing_article)
         9.times do
           example_image = Rails.root.join("spec/fixtures/files/example.#{%w[jpg jpeg png webp].sample}")
@@ -345,9 +345,9 @@ RSpec.describe ArticleForm, type: :model do
       end
     end
 
-    context 'when an article exists with an image and image_attributes cl_id count is 10' do
+    context 'when an article exists with 1 image and adding 10 images' do
+      let!(:existing_article) { create(:article, :with_an_image) }
       let(:article_form) do
-        existing_article = create(:article, :with_an_image)
         image_attributes = create_image_attributes(existing_article)
         10.times do
           example_image = Rails.root.join("spec/fixtures/files/example.#{%w[jpg jpeg png webp].sample}")
@@ -376,9 +376,9 @@ RSpec.describe ArticleForm, type: :model do
       end
     end
 
-    context 'when an article exists with 9 images and image_attributes cl_id is blank' do
+    context 'when an article exists with 9 images without adding images' do
+      let!(:existing_article) { create(:article, :with_9_images) }
       let(:article_form) do
-        existing_article = create(:article, :with_9_images)
         image_attributes = create_image_attributes(existing_article)
         attributes = { **attributes_for(:article), image_attributes: image_attributes }
         described_class.new(attributes, article: existing_article)
@@ -397,9 +397,9 @@ RSpec.describe ArticleForm, type: :model do
       end
     end
 
-    context 'when an article exists with 9 images and image_attributes cl_id cl_id is 1' do
+    context 'when an article exists with 9 images and adding 1 image' do
+      let!(:existing_article) { create(:article, :with_9_images) }
       let(:article_form) do
-        existing_article = create(:article, :with_9_images)
         image_attributes = create_image_attributes(existing_article)
         example_image = Rails.root.join("spec/fixtures/files/example.#{%w[jpg jpeg png webp].sample}")
         image_attributes[Time.now.to_i.to_s] = { 'cl_id' => Rack::Test::UploadedFile.new(example_image) }
@@ -420,9 +420,9 @@ RSpec.describe ArticleForm, type: :model do
       end
     end
 
-    context 'when an article exists with 9 images and image_attributes cl_id count is 2' do
+    context 'when an article exists with 9 images and adding 2 images' do
+      let!(:existing_article) { create(:article, :with_9_images) }
       let(:article_form) do
-        existing_article = create(:article, :with_9_images)
         image_attributes = create_image_attributes(existing_article)
         2.times do
           example_image = Rails.root.join("spec/fixtures/files/example.#{%w[jpg jpeg png webp].sample}")
@@ -451,9 +451,9 @@ RSpec.describe ArticleForm, type: :model do
       end
     end
 
-    context 'when an article exists with 10 images and image_attributes cl_id is blank' do
+    context 'when an article exists with 10 images without adding images' do
+      let!(:existing_article) { create(:article, :with_10_images) }
       let(:article_form) do
-        existing_article = create(:article, :with_10_images)
         image_attributes = create_image_attributes(existing_article)
         attributes = { **attributes_for(:article), image_attributes: image_attributes }
         described_class.new(attributes, article: existing_article)
@@ -472,9 +472,9 @@ RSpec.describe ArticleForm, type: :model do
       end
     end
 
-    context 'when an article exists with 10 images and image_attributes cl_id count is 1' do
+    context 'when an article exists with 10 images and adding 1 image' do
+      let!(:existing_article) { create(:article, :with_10_images) }
       let(:article_form) do
-        existing_article = create(:article, :with_10_images)
         image_attributes = create_image_attributes(existing_article)
         example_image = Rails.root.join("spec/fixtures/files/example.#{%w[jpg jpeg png webp].sample}")
         image_attributes[Time.now.to_i.to_s] = { 'cl_id' => Rack::Test::UploadedFile.new(example_image) }
@@ -517,7 +517,7 @@ RSpec.describe ArticleForm, type: :model do
       end
     end
 
-    context 'when an article exists with an image and article and images are invalid' do
+    context 'when an article exists with 1 image and article and images are invalid' do
       let(:article_form) do
         existing_article = create(:article, :with_an_image)
         image_attributes = create_image_attributes(existing_article)
