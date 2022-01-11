@@ -28,6 +28,7 @@ class ArticleForm
       if destroying_image_ids.present?
         destroying_images = article.images.where(id: destroying_image_ids)
         destroying_images.delete_all
+        article.reload
       end
 
       new_cl_ids.each { |cl_id| article.images.create!(cl_id: cl_id) }

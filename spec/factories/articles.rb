@@ -10,6 +10,13 @@ FactoryBot.define do
       end
     end
 
+    trait :with_2_images do
+      after(:create) do |article|
+        create_list(:image, 2, article: article)
+        article.reload
+      end
+    end
+
     trait :with_3_images do
       after(:create) do |article|
         create_list(:image, 3, article: article)

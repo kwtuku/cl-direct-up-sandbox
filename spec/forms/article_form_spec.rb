@@ -585,5 +585,303 @@ RSpec.describe ArticleForm, type: :model do
         expect(article_form.errors).to be_of_kind(:base, :too_many_images)
       end
     end
+
+    context 'when an article exists with 1 image and destroying 1 image' do
+      let!(:existing_article) { create(:article, :with_an_image) }
+      let(:article_form) do
+        image_attributes = create_image_attributes(existing_article)
+        image_attributes[existing_article.image_ids.first]['_destroy'] = 'true'
+        attributes = { **attributes_for(:article), image_attributes: image_attributes }
+        described_class.new(attributes, article: existing_article)
+      end
+
+      it 'returns false' do
+        expect(article_form.save).to be_falsey
+      end
+
+      it 'has the error of require_images' do
+        article_form.save
+        expect(article_form.errors).to be_of_kind(:base, :require_images)
+      end
+
+      it 'does not increase article count' do
+        expect { article_form.save }.to change(Article, :count).by(0)
+      end
+
+      it 'does not decrease image count' do
+        expect { article_form.save }.to change(Image, :count).by(0)
+      end
+    end
+
+    context 'when an article exists with 2 image and destroying 1 image' do
+      let!(:existing_article) { create(:article, :with_2_images) }
+      let(:article_form) do
+        image_attributes = create_image_attributes(existing_article)
+        image_attributes[existing_article.image_ids.sample]['_destroy'] = 'true'
+        attributes = { **attributes_for(:article), image_attributes: image_attributes }
+        described_class.new(attributes, article: existing_article)
+      end
+
+      it 'returns true' do
+        expect(article_form.save).to be_truthy
+      end
+
+      it 'does not increase article count' do
+        expect { article_form.save }.to change(Article, :count).by(0)
+      end
+
+      it 'decreases image count by -1' do
+        expect { article_form.save }.to change(Image, :count).by(-1)
+      end
+    end
+
+    context 'when an article exists with 10 images and destroying 1 image' do
+      let!(:existing_article) { create(:article, :with_10_images) }
+      let(:article_form) do
+        image_attributes = create_image_attributes(existing_article)
+        image_attributes[existing_article.image_ids.sample]['_destroy'] = 'true'
+        attributes = { **attributes_for(:article), image_attributes: image_attributes }
+        described_class.new(attributes, article: existing_article)
+      end
+
+      it 'returns true' do
+        expect(article_form.save).to be_truthy
+      end
+
+      it 'does not increase article count' do
+        expect { article_form.save }.to change(Article, :count).by(0)
+      end
+
+      it 'decreases image count by -1' do
+        expect { article_form.save }.to change(Image, :count).by(-1)
+      end
+    end
+
+    context 'when an article exists with 10 images and destroying 9 images' do
+      let!(:existing_article) { create(:article, :with_10_images) }
+      let(:article_form) do
+        image_attributes = create_image_attributes(existing_article)
+        existing_article.image_ids.sample(9).each { |id| image_attributes[id]['_destroy'] = 'true' }
+        attributes = { **attributes_for(:article), image_attributes: image_attributes }
+        described_class.new(attributes, article: existing_article)
+      end
+
+      it 'returns true' do
+        expect(article_form.save).to be_truthy
+      end
+
+      it 'does not increase article count' do
+        expect { article_form.save }.to change(Article, :count).by(0)
+      end
+
+      it 'decreases image count by -9' do
+        expect { article_form.save }.to change(Image, :count).by(-9)
+      end
+    end
+
+    context 'when an article exists with 10 images and destroying 10 images' do
+      let!(:existing_article) { create(:article, :with_10_images) }
+      let(:article_form) do
+        image_attributes = create_image_attributes(existing_article)
+        existing_article.image_ids.each { |id| image_attributes[id]['_destroy'] = 'true' }
+        attributes = { **attributes_for(:article), image_attributes: image_attributes }
+        described_class.new(attributes, article: existing_article)
+      end
+
+      it 'returns false' do
+        expect(article_form.save).to be_falsey
+      end
+
+      it 'has the error of require_images' do
+        article_form.save
+        expect(article_form.errors).to be_of_kind(:base, :require_images)
+      end
+
+      it 'does not increase article count' do
+        expect { article_form.save }.to change(Article, :count).by(0)
+      end
+
+      it 'does not decrease image count' do
+        expect { article_form.save }.to change(Image, :count).by(0)
+      end
+    end
+
+    context 'when an article exists with 1 image and destroying 1 image and adding 1 image' do
+      let!(:existing_article) { create(:article, :with_an_image) }
+      let(:article_form) do
+        image_attributes = create_image_attributes(existing_article)
+        image_attributes[existing_article.image_ids.first]['_destroy'] = 'true'
+        example_image = Rails.root.join("spec/fixtures/files/example.#{%w[jpg jpeg png webp].sample}")
+        image_attributes[Time.now.to_i.to_s] = { 'cl_id' => Rack::Test::UploadedFile.new(example_image) }
+        attributes = { **attributes_for(:article), image_attributes: image_attributes }
+        described_class.new(attributes, article: existing_article)
+      end
+
+      it 'returns true' do
+        expect(article_form.save).to be_truthy
+      end
+
+      it 'does not increase article count' do
+        expect { article_form.save }.to change(Article, :count).by(0)
+      end
+
+      it 'does not change image count' do
+        expect { article_form.save }.to change(Image, :count).by(0)
+      end
+
+      it 'changes image_ids' do
+        destroying_image_ids = existing_article.image_ids
+        article_form.save
+        expect(existing_article.reload.image_ids).not_to match_array destroying_image_ids
+      end
+    end
+
+    context 'when an article exists with 1 image and destroying 1 image and adding 10 images' do
+      let!(:existing_article) { create(:article, :with_an_image) }
+      let(:article_form) do
+        image_attributes = create_image_attributes(existing_article)
+        image_attributes[existing_article.image_ids.first]['_destroy'] = 'true'
+        10.times do
+          example_image = Rails.root.join("spec/fixtures/files/example.#{%w[jpg jpeg png webp].sample}")
+          random_number = SecureRandom.random_number(1 << 64)
+          image_attributes[random_number] = { 'cl_id' => Rack::Test::UploadedFile.new(example_image) }
+        end
+        attributes = { **attributes_for(:article), image_attributes: image_attributes }
+        described_class.new(attributes, article: existing_article)
+      end
+
+      it 'returns true' do
+        expect(article_form.save).to be_truthy
+      end
+
+      it 'does not increase article count' do
+        expect { article_form.save }.to change(Article, :count).by(0)
+      end
+
+      it 'changes image count from 1 to 10' do
+        expect { article_form.save }.to change(Image, :count).from(1).to(10)
+      end
+    end
+
+    context 'when an article exists with 1 image and destroying 1 image and adding 11 images' do
+      let!(:existing_article) { create(:article, :with_an_image) }
+      let(:article_form) do
+        image_attributes = create_image_attributes(existing_article)
+        image_attributes[existing_article.image_ids.first]['_destroy'] = 'true'
+        11.times do
+          example_image = Rails.root.join("spec/fixtures/files/example.#{%w[jpg jpeg png webp].sample}")
+          random_number = SecureRandom.random_number(1 << 64)
+          image_attributes[random_number] = { 'cl_id' => Rack::Test::UploadedFile.new(example_image) }
+        end
+        attributes = { **attributes_for(:article), image_attributes: image_attributes }
+        described_class.new(attributes, article: existing_article)
+      end
+
+      it 'returns false' do
+        expect(article_form.save).to be_falsey
+      end
+
+      it 'has the error of too_many_images' do
+        article_form.save
+        expect(article_form.errors).to be_of_kind(:base, :too_many_images)
+      end
+
+      it 'does not increase article count' do
+        expect { article_form.save }.to change(Article, :count).by(0)
+      end
+
+      it 'does not increase image count' do
+        expect { article_form.save }.to change(Image, :count).by(0)
+      end
+    end
+
+    context 'when an article exists with 10 images and destroying 10 images and adding 1 image' do
+      let!(:existing_article) { create(:article, :with_10_images) }
+      let(:article_form) do
+        image_attributes = create_image_attributes(existing_article)
+        existing_article.image_ids.each { |id| image_attributes[id]['_destroy'] = 'true' }
+        example_image = Rails.root.join("spec/fixtures/files/example.#{%w[jpg jpeg png webp].sample}")
+        image_attributes[Time.now.to_i.to_s] = { 'cl_id' => Rack::Test::UploadedFile.new(example_image) }
+        attributes = { **attributes_for(:article), image_attributes: image_attributes }
+        described_class.new(attributes, article: existing_article)
+      end
+
+      it 'returns true' do
+        expect(article_form.save).to be_truthy
+      end
+
+      it 'does not increase article count' do
+        expect { article_form.save }.to change(Article, :count).by(0)
+      end
+
+      it 'changes image count from 10 to 1' do
+        expect { article_form.save }.to change(Image, :count).from(10).to(1)
+      end
+    end
+
+    context 'when an article exists with 10 images and destroying 10 images and adding 10 images' do
+      let!(:existing_article) { create(:article, :with_10_images) }
+      let(:article_form) do
+        image_attributes = create_image_attributes(existing_article)
+        existing_article.image_ids.each { |id| image_attributes[id]['_destroy'] = 'true' }
+        10.times do
+          example_image = Rails.root.join("spec/fixtures/files/example.#{%w[jpg jpeg png webp].sample}")
+          random_number = SecureRandom.random_number(1 << 64)
+          image_attributes[random_number] = { 'cl_id' => Rack::Test::UploadedFile.new(example_image) }
+        end
+        attributes = { **attributes_for(:article), image_attributes: image_attributes }
+        described_class.new(attributes, article: existing_article)
+      end
+
+      it 'returns true' do
+        expect(article_form.save).to be_truthy
+      end
+
+      it 'does not increase article count' do
+        expect { article_form.save }.to change(Article, :count).by(0)
+      end
+
+      it 'does not change image count' do
+        expect { article_form.save }.to change(Image, :count).by(0)
+      end
+
+      it 'changes image_ids' do
+        destroying_image_ids = existing_article.image_ids
+        article_form.save
+        expect(existing_article.reload.image_ids).not_to match_array destroying_image_ids
+      end
+    end
+
+    context 'when an article exists with 10 images and destroying 10 images and adding 11 images' do
+      let!(:existing_article) { create(:article, :with_10_images) }
+      let(:article_form) do
+        image_attributes = create_image_attributes(existing_article)
+        existing_article.image_ids.each { |id| image_attributes[id]['_destroy'] = 'true' }
+        11.times do
+          example_image = Rails.root.join("spec/fixtures/files/example.#{%w[jpg jpeg png webp].sample}")
+          random_number = SecureRandom.random_number(1 << 64)
+          image_attributes[random_number] = { 'cl_id' => Rack::Test::UploadedFile.new(example_image) }
+        end
+        attributes = { **attributes_for(:article), image_attributes: image_attributes }
+        described_class.new(attributes, article: existing_article)
+      end
+
+      it 'returns false' do
+        expect(article_form.save).to be_falsey
+      end
+
+      it 'has the error of too_many_images' do
+        article_form.save
+        expect(article_form.errors).to be_of_kind(:base, :too_many_images)
+      end
+
+      it 'does not increase article count' do
+        expect { article_form.save }.to change(Article, :count).by(0)
+      end
+
+      it 'does not increase image count' do
+        expect { article_form.save }.to change(Image, :count).by(0)
+      end
+    end
   end
 end
