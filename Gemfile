@@ -29,6 +29,7 @@ gem 'carrierwave'
 gem 'cloudinary'
 gem 'devise'
 gem 'devise-i18n'
+gem 'faker'
 gem 'rails-i18n'
 
 # Reduces boot times through caching; required in config/boot.rb

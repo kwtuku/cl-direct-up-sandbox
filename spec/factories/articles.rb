@@ -1,7 +1,7 @@
 FactoryBot.define do
   factory :article do
-    title { 'title' }
-    body { 'body' }
+    title { Faker::Lorem.word }
+    body { Faker::Lorem.paragraph(sentence_count: 10) }
 
     trait :with_an_image do
       after(:create) do |article|
