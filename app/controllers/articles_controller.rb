@@ -3,7 +3,7 @@ class ArticlesController < ApplicationController
 
   # GET /articles
   def index
-    @articles = Article.all
+    @articles = Article.eager_load(:images)
   end
 
   # GET /articles/1
