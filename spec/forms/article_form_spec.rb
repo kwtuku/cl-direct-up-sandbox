@@ -1,9 +1,17 @@
 require 'rails_helper'
 
 RSpec.describe ArticleForm, type: :model do
+  def example_image_path
+    Rails.root.join("spec/fixtures/files/example.#{%w[jpg jpeg png webp].sample}")
+  end
+
+  def random_number
+    SecureRandom.random_number(1 << 64)
+  end
+
   def create_image_attributes(existing_article)
     existing_article.images.map do |image|
-      [image.id, image.attributes.slice('id').merge({ '_destroy' => 'false' })]
+      [image.id, { **image.attributes.slice('id'), '_destroy' => 'false' }]
     end.to_h
   end
 
@@ -18,11 +26,11 @@ RSpec.describe ArticleForm, type: :model do
 
     context 'when new article with 1 image' do
       it 'returns an array of cl_id' do
-        example_image_path = Rails.root.join("spec/fixtures/files/example.#{%w[jpg jpeg png webp].sample}")
-        image_attributes = { Time.now.to_i.to_s => { 'cl_id' => example_image_path } }
+        image_path = example_image_path
+        image_attributes = { Time.now.to_i.to_s => { 'cl_id' => image_path } }
         attributes = { **attributes_for(:article), image_attributes: image_attributes }
         article_form = described_class.new(attributes, article: Article.new)
-        expect(article_form.new_cl_ids).to eq [example_image_path]
+        expect(article_form.new_cl_ids).to eq [image_path]
       end
     end
 
@@ -31,10 +39,9 @@ RSpec.describe ArticleForm, type: :model do
         image_attributes = {}
         example_image_paths = []
         2.times do
-          example_image_path = Rails.root.join("spec/fixtures/files/example.#{%w[jpg jpeg png webp].sample}")
-          random_number = SecureRandom.random_number(1 << 64)
-          image_attributes[random_number] = { 'cl_id' => example_image_path }
-          example_image_paths << example_image_path
+          image_path = example_image_path
+          image_attributes[random_number] = { 'cl_id' => image_path }
+          example_image_paths << image_path
         end
         attributes = { **attributes_for(:article), image_attributes: image_attributes }
         article_form = described_class.new(attributes, article: Article.new)
@@ -56,11 +63,11 @@ RSpec.describe ArticleForm, type: :model do
       it 'returns an array of cl_id' do
         existing_article = create(:article, :with_an_image)
         image_attributes = create_image_attributes(existing_article)
-        example_image_path = Rails.root.join("spec/fixtures/files/example.#{%w[jpg jpeg png webp].sample}")
-        image_attributes[Time.now.to_i.to_s] = { 'cl_id' => example_image_path }
+        image_path = example_image_path
+        image_attributes[Time.now.to_i.to_s] = { 'cl_id' => image_path }
         attributes = { **attributes_for(:article), image_attributes: image_attributes }
         article_form = described_class.new(attributes, article: existing_article)
-        expect(article_form.new_cl_ids).to eq [example_image_path]
+        expect(article_form.new_cl_ids).to eq [image_path]
       end
     end
 
@@ -69,11 +76,10 @@ RSpec.describe ArticleForm, type: :model do
         existing_article = create(:article, :with_an_image)
         image_attributes = create_image_attributes(existing_article)
         example_image_paths = []
-        2.times do
-          example_image_path = Rails.root.join("spec/fixtures/files/example.#{%w[jpg jpeg png webp].sample}")
-          random_number = SecureRandom.random_number(1 << 64)
-          image_attributes[random_number] = { 'cl_id' => example_image_path }
-          example_image_paths << example_image_path
+        10.times do
+          image_path = example_image_path
+          image_attributes[random_number] = { 'cl_id' => image_path }
+          example_image_paths << image_path
         end
         attributes = { **attributes_for(:article), image_attributes: image_attributes }
         article_form = described_class.new(attributes, article: existing_article)
@@ -93,8 +99,7 @@ RSpec.describe ArticleForm, type: :model do
 
     context 'when new article and adding an image' do
       it 'returns []' do
-        example_image = Rails.root.join("spec/fixtures/files/example.#{%w[jpg jpeg png webp].sample}")
-        image_attributes = { Time.now.to_i.to_s => { 'cl_id' => Rack::Test::UploadedFile.new(example_image) } }
+        image_attributes = { Time.now.to_i.to_s => { 'cl_id' => Rack::Test::UploadedFile.new(example_image_path) } }
         attributes = { **attributes_for(:article), image_attributes: image_attributes }
         article_form = described_class.new(attributes, article: Article.new)
         expect(article_form.destroying_image_ids).to eq []
@@ -201,8 +206,7 @@ RSpec.describe ArticleForm, type: :model do
 
     context 'when new article with 1 image' do
       let(:article_form) do
-        example_image = Rails.root.join("spec/fixtures/files/example.#{%w[jpg jpeg png webp].sample}")
-        image_attributes = { Time.now.to_i.to_s => { 'cl_id' => Rack::Test::UploadedFile.new(example_image) } }
+        image_attributes = { Time.now.to_i.to_s => { 'cl_id' => Rack::Test::UploadedFile.new(example_image_path) } }
         attributes = { **attributes_for(:article), image_attributes: image_attributes }
         described_class.new(attributes, article: Article.new)
       end
@@ -223,11 +227,7 @@ RSpec.describe ArticleForm, type: :model do
     context 'when new article with 10 images' do
       let(:article_form) do
         image_attributes = {}
-        10.times do
-          example_image = Rails.root.join("spec/fixtures/files/example.#{%w[jpg jpeg png webp].sample}")
-          random_number = SecureRandom.random_number(1 << 64)
-          image_attributes[random_number] = { 'cl_id' => Rack::Test::UploadedFile.new(example_image) }
-        end
+        10.times { image_attributes[random_number] = { 'cl_id' => Rack::Test::UploadedFile.new(example_image_path) } }
         attributes = { **attributes_for(:article), image_attributes: image_attributes }
         described_class.new(attributes, article: Article.new)
       end
@@ -248,11 +248,7 @@ RSpec.describe ArticleForm, type: :model do
     context 'when new article with 11 images' do
       let(:article_form) do
         image_attributes = {}
-        11.times do
-          example_image = Rails.root.join("spec/fixtures/files/example.#{%w[jpg jpeg png webp].sample}")
-          random_number = SecureRandom.random_number(1 << 64)
-          image_attributes[random_number] = { 'cl_id' => Rack::Test::UploadedFile.new(example_image) }
-        end
+        11.times { image_attributes[random_number] = { 'cl_id' => Rack::Test::UploadedFile.new(example_image_path) } }
         attributes = { **attributes_for(:article), image_attributes: image_attributes }
         described_class.new(attributes, article: Article.new)
       end
@@ -300,8 +296,7 @@ RSpec.describe ArticleForm, type: :model do
       let!(:existing_article) { create(:article, :with_an_image) }
       let(:article_form) do
         image_attributes = create_image_attributes(existing_article)
-        example_image = Rails.root.join("spec/fixtures/files/example.#{%w[jpg jpeg png webp].sample}")
-        image_attributes[Time.now.to_i.to_s] = { 'cl_id' => Rack::Test::UploadedFile.new(example_image) }
+        image_attributes[Time.now.to_i.to_s] = { 'cl_id' => Rack::Test::UploadedFile.new(example_image_path) }
         attributes = { **attributes_for(:article), image_attributes: image_attributes }
         described_class.new(attributes, article: existing_article)
       end
@@ -323,11 +318,7 @@ RSpec.describe ArticleForm, type: :model do
       let!(:existing_article) { create(:article, :with_an_image) }
       let(:article_form) do
         image_attributes = create_image_attributes(existing_article)
-        9.times do
-          example_image = Rails.root.join("spec/fixtures/files/example.#{%w[jpg jpeg png webp].sample}")
-          random_number = SecureRandom.random_number(1 << 64)
-          image_attributes[random_number] = { 'cl_id' => Rack::Test::UploadedFile.new(example_image) }
-        end
+        9.times { image_attributes[random_number] = { 'cl_id' => Rack::Test::UploadedFile.new(example_image_path) } }
         attributes = { **attributes_for(:article), image_attributes: image_attributes }
         described_class.new(attributes, article: existing_article)
       end
@@ -349,11 +340,7 @@ RSpec.describe ArticleForm, type: :model do
       let!(:existing_article) { create(:article, :with_an_image) }
       let(:article_form) do
         image_attributes = create_image_attributes(existing_article)
-        10.times do
-          example_image = Rails.root.join("spec/fixtures/files/example.#{%w[jpg jpeg png webp].sample}")
-          random_number = SecureRandom.random_number(1 << 64)
-          image_attributes[random_number] = { 'cl_id' => Rack::Test::UploadedFile.new(example_image) }
-        end
+        10.times { image_attributes[random_number] = { 'cl_id' => Rack::Test::UploadedFile.new(example_image_path) } }
         attributes = { **attributes_for(:article), image_attributes: image_attributes }
         described_class.new(attributes, article: existing_article)
       end
@@ -401,8 +388,7 @@ RSpec.describe ArticleForm, type: :model do
       let!(:existing_article) { create(:article, :with_9_images) }
       let(:article_form) do
         image_attributes = create_image_attributes(existing_article)
-        example_image = Rails.root.join("spec/fixtures/files/example.#{%w[jpg jpeg png webp].sample}")
-        image_attributes[Time.now.to_i.to_s] = { 'cl_id' => Rack::Test::UploadedFile.new(example_image) }
+        image_attributes[Time.now.to_i.to_s] = { 'cl_id' => Rack::Test::UploadedFile.new(example_image_path) }
         attributes = { **attributes_for(:article), image_attributes: image_attributes }
         described_class.new(attributes, article: existing_article)
       end
@@ -424,11 +410,7 @@ RSpec.describe ArticleForm, type: :model do
       let!(:existing_article) { create(:article, :with_9_images) }
       let(:article_form) do
         image_attributes = create_image_attributes(existing_article)
-        2.times do
-          example_image = Rails.root.join("spec/fixtures/files/example.#{%w[jpg jpeg png webp].sample}")
-          random_number = SecureRandom.random_number(1 << 64)
-          image_attributes[random_number] = { 'cl_id' => Rack::Test::UploadedFile.new(example_image) }
-        end
+        2.times { image_attributes[random_number] = { 'cl_id' => Rack::Test::UploadedFile.new(example_image_path) } }
         attributes = { **attributes_for(:article), image_attributes: image_attributes }
         described_class.new(attributes, article: existing_article)
       end
@@ -476,8 +458,7 @@ RSpec.describe ArticleForm, type: :model do
       let!(:existing_article) { create(:article, :with_10_images) }
       let(:article_form) do
         image_attributes = create_image_attributes(existing_article)
-        example_image = Rails.root.join("spec/fixtures/files/example.#{%w[jpg jpeg png webp].sample}")
-        image_attributes[Time.now.to_i.to_s] = { 'cl_id' => Rack::Test::UploadedFile.new(example_image) }
+        image_attributes[Time.now.to_i.to_s] = { 'cl_id' => Rack::Test::UploadedFile.new(example_image_path) }
         attributes = { **attributes_for(:article), image_attributes: image_attributes }
         described_class.new(attributes, article: existing_article)
       end
@@ -521,11 +502,7 @@ RSpec.describe ArticleForm, type: :model do
       let(:article_form) do
         existing_article = create(:article, :with_an_image)
         image_attributes = create_image_attributes(existing_article)
-        10.times do
-          example_image = Rails.root.join("spec/fixtures/files/example.#{%w[jpg jpeg png webp].sample}")
-          random_number = SecureRandom.random_number(1 << 64)
-          image_attributes[random_number] = { 'cl_id' => Rack::Test::UploadedFile.new(example_image) }
-        end
+        10.times { image_attributes[random_number] = { 'cl_id' => Rack::Test::UploadedFile.new(example_image_path) } }
         attributes = { **attributes_for(:article, title: nil), image_attributes: image_attributes }
         described_class.new(attributes, article: existing_article)
       end
@@ -545,11 +522,7 @@ RSpec.describe ArticleForm, type: :model do
       let(:article_form) do
         existing_article = create(:article, :with_9_images)
         image_attributes = create_image_attributes(existing_article)
-        2.times do
-          example_image = Rails.root.join("spec/fixtures/files/example.#{%w[jpg jpeg png webp].sample}")
-          random_number = SecureRandom.random_number(1 << 64)
-          image_attributes[random_number] = { 'cl_id' => Rack::Test::UploadedFile.new(example_image) }
-        end
+        2.times { image_attributes[random_number] = { 'cl_id' => Rack::Test::UploadedFile.new(example_image_path) } }
         attributes = { **attributes_for(:article, title: nil), image_attributes: image_attributes }
         described_class.new(attributes, article: existing_article)
       end
@@ -569,8 +542,7 @@ RSpec.describe ArticleForm, type: :model do
       let(:article_form) do
         existing_article = create(:article, :with_10_images)
         image_attributes = create_image_attributes(existing_article)
-        example_image = Rails.root.join("spec/fixtures/files/example.#{%w[jpg jpeg png webp].sample}")
-        image_attributes[Time.now.to_i.to_s] = { 'cl_id' => Rack::Test::UploadedFile.new(example_image) }
+        image_attributes[Time.now.to_i.to_s] = { 'cl_id' => Rack::Test::UploadedFile.new(example_image_path) }
         attributes = { **attributes_for(:article, title: nil), image_attributes: image_attributes }
         described_class.new(attributes, article: existing_article)
       end
@@ -711,8 +683,7 @@ RSpec.describe ArticleForm, type: :model do
       let(:article_form) do
         image_attributes = create_image_attributes(existing_article)
         image_attributes[existing_article.image_ids.first]['_destroy'] = 'true'
-        example_image = Rails.root.join("spec/fixtures/files/example.#{%w[jpg jpeg png webp].sample}")
-        image_attributes[Time.now.to_i.to_s] = { 'cl_id' => Rack::Test::UploadedFile.new(example_image) }
+        image_attributes[Time.now.to_i.to_s] = { 'cl_id' => Rack::Test::UploadedFile.new(example_image_path) }
         attributes = { **attributes_for(:article), image_attributes: image_attributes }
         described_class.new(attributes, article: existing_article)
       end
@@ -741,11 +712,7 @@ RSpec.describe ArticleForm, type: :model do
       let(:article_form) do
         image_attributes = create_image_attributes(existing_article)
         image_attributes[existing_article.image_ids.first]['_destroy'] = 'true'
-        10.times do
-          example_image = Rails.root.join("spec/fixtures/files/example.#{%w[jpg jpeg png webp].sample}")
-          random_number = SecureRandom.random_number(1 << 64)
-          image_attributes[random_number] = { 'cl_id' => Rack::Test::UploadedFile.new(example_image) }
-        end
+        10.times { image_attributes[random_number] = { 'cl_id' => Rack::Test::UploadedFile.new(example_image_path) } }
         attributes = { **attributes_for(:article), image_attributes: image_attributes }
         described_class.new(attributes, article: existing_article)
       end
@@ -768,11 +735,7 @@ RSpec.describe ArticleForm, type: :model do
       let(:article_form) do
         image_attributes = create_image_attributes(existing_article)
         image_attributes[existing_article.image_ids.first]['_destroy'] = 'true'
-        11.times do
-          example_image = Rails.root.join("spec/fixtures/files/example.#{%w[jpg jpeg png webp].sample}")
-          random_number = SecureRandom.random_number(1 << 64)
-          image_attributes[random_number] = { 'cl_id' => Rack::Test::UploadedFile.new(example_image) }
-        end
+        11.times { image_attributes[random_number] = { 'cl_id' => Rack::Test::UploadedFile.new(example_image_path) } }
         attributes = { **attributes_for(:article), image_attributes: image_attributes }
         described_class.new(attributes, article: existing_article)
       end
@@ -800,8 +763,7 @@ RSpec.describe ArticleForm, type: :model do
       let(:article_form) do
         image_attributes = create_image_attributes(existing_article)
         existing_article.image_ids.each { |id| image_attributes[id]['_destroy'] = 'true' }
-        example_image = Rails.root.join("spec/fixtures/files/example.#{%w[jpg jpeg png webp].sample}")
-        image_attributes[Time.now.to_i.to_s] = { 'cl_id' => Rack::Test::UploadedFile.new(example_image) }
+        image_attributes[Time.now.to_i.to_s] = { 'cl_id' => Rack::Test::UploadedFile.new(example_image_path) }
         attributes = { **attributes_for(:article), image_attributes: image_attributes }
         described_class.new(attributes, article: existing_article)
       end
@@ -824,11 +786,7 @@ RSpec.describe ArticleForm, type: :model do
       let(:article_form) do
         image_attributes = create_image_attributes(existing_article)
         existing_article.image_ids.each { |id| image_attributes[id]['_destroy'] = 'true' }
-        10.times do
-          example_image = Rails.root.join("spec/fixtures/files/example.#{%w[jpg jpeg png webp].sample}")
-          random_number = SecureRandom.random_number(1 << 64)
-          image_attributes[random_number] = { 'cl_id' => Rack::Test::UploadedFile.new(example_image) }
-        end
+        10.times { image_attributes[random_number] = { 'cl_id' => Rack::Test::UploadedFile.new(example_image_path) } }
         attributes = { **attributes_for(:article), image_attributes: image_attributes }
         described_class.new(attributes, article: existing_article)
       end
@@ -857,11 +815,7 @@ RSpec.describe ArticleForm, type: :model do
       let(:article_form) do
         image_attributes = create_image_attributes(existing_article)
         existing_article.image_ids.each { |id| image_attributes[id]['_destroy'] = 'true' }
-        11.times do
-          example_image = Rails.root.join("spec/fixtures/files/example.#{%w[jpg jpeg png webp].sample}")
-          random_number = SecureRandom.random_number(1 << 64)
-          image_attributes[random_number] = { 'cl_id' => Rack::Test::UploadedFile.new(example_image) }
-        end
+        11.times { image_attributes[random_number] = { 'cl_id' => Rack::Test::UploadedFile.new(example_image_path) } }
         attributes = { **attributes_for(:article), image_attributes: image_attributes }
         described_class.new(attributes, article: existing_article)
       end
