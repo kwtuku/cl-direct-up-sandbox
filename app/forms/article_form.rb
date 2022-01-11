@@ -47,13 +47,13 @@ class ArticleForm
   def new_cl_ids
     return [] if image_attributes.nil?
 
-    image_attributes.map { |_k, v| v['cl_id'] }.compact
+    image_attributes.values.map { |v| v['cl_id'] }.compact
   end
 
   def destroying_image_ids
     return [] if image_attributes.nil?
 
-    image_attributes.select { |_k, v| v['_destroy'] == 'true' }.map { |_k, v| v['id'] }
+    image_attributes.values.filter { |v| v['_destroy'] == 'true' }.map { |v| v['id'] }
   end
 
   private
@@ -62,7 +62,7 @@ class ArticleForm
 
   def default_attributes
     image_attributes = article.images.map do |image|
-      [image.id, image.attributes.slice('id').merge({ '_destroy' => 'false' })]
+      [image.id, { **image.attributes.slice('id'), '_destroy' => 'false' }]
     end.to_h
 
     {

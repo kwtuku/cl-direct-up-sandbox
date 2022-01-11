@@ -32,12 +32,10 @@
   <div class="field">
     <%= form.label :image_attributes, '画像', class: 'label' %>
 
-    <% if article %>
-      <% article_form.image_attributes.select { |k, v| v['id'] }.values.zip(article.images) do |values, image| %>
-        <%= form.fields_for :image_attributes, image, index: image.id do |image_form| %>
-          <%= image_form.hidden_field :id %>
-          <%= image_form.hidden_field :_destroy %>
-        <% end %>
+    <% article&.images&.each do |image| %>
+      <%= form.fields_for :image_attributes, image, index: image.id do |image_form| %>
+        <%= image_form.hidden_field :id %>
+        <%= image_form.hidden_field :_destroy %>
       <% end %>
     <% end %>
 
