@@ -29,6 +29,7 @@ gem 'carrierwave'
 gem 'cloudinary'
 gem 'devise'
 gem 'devise-i18n'
+gem 'faker'
 gem 'rails-i18n'
 
 # Reduces boot times through caching; required in config/boot.rb
@@ -51,6 +52,7 @@ group :development do
   # Spring speeds up development by keeping your application running in the background. Read more: https://github.com/rails/spring
   gem 'spring'
 
+  gem 'bullet'
   gem 'rubocop', require: false
   gem 'rubocop-performance', require: false
   gem 'rubocop-rails', require: false

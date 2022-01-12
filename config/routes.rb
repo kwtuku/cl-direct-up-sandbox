@@ -5,9 +5,6 @@ Rails.application.routes.draw do
 
   namespace :api, format: 'json' do
     namespace :v0 do
-      resources :articles, only: %i[] do
-        resources :images, only: %i[destroy]
-      end
       resources :admin_cloudinary, only: %i[destroy]
     end
   end
