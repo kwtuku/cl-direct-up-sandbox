@@ -3,7 +3,7 @@ class ArticlesController < ApplicationController
 
   # GET /articles
   def index
-    @articles = Article.eager_load(:images)
+    @articles = Article.eager_load(:images).order(position: :ASC).order(id: :DESC)
   end
 
   # GET /articles/1
