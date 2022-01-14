@@ -39,9 +39,9 @@
       <% end %>
     <% end %>
 
-    <div class="columns is-multiline is-centered" id="cloudinary-fileupload-previews">
+    <div class="columns is-multiline is-centered" id="cloudinary-fileupload-previews" data-sortable="items">
       <% article&.images&.each do |image| %>
-        <div class="column is-one-fifth is-flex">
+        <div class="column is-one-fifth is-flex" data-sortable-key="<%= image.id %>">
           <figure>
             <%= cl_image_tag image.cl_id, width: 500, height: 500, crop: :fill %>
           </figure>
@@ -99,3 +99,4 @@
 <%= javascript_pack_tag 'jqueryCloudinaryMultipleUpload', 'data-turbolinks-track': 'reload' %>
 <%= javascript_pack_tag 'removeImage', 'data-turbolinks-track': 'reload' %>
 <%= javascript_pack_tag 'removeImageCache', 'data-turbolinks-track': 'reload' %>
+<%= javascript_pack_tag 'sortPositionInputs', 'data-turbolinks-track': 'reload' %>
