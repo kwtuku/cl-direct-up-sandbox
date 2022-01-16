@@ -5,7 +5,7 @@ FactoryBot.define do
 
     trait :with_an_image do
       after(:create) do |article|
-        create(:image, article: article)
+        create(:image, position: 1, article: article)
         article.reload
       end
     end
@@ -13,28 +13,28 @@ FactoryBot.define do
     trait :with_2_images do
       after(:create) do |article|
         create_list(:image, 2, article: article)
-        article.reload
+        article.reload.images.shuffle.each.with_index(1) { |image, i| image.update(position: i) }
       end
     end
 
     trait :with_3_images do
       after(:create) do |article|
         create_list(:image, 3, article: article)
-        article.reload
+        article.reload.images.shuffle.each.with_index(1) { |image, i| image.update(position: i) }
       end
     end
 
     trait :with_9_images do
       after(:create) do |article|
         create_list(:image, 9, article: article)
-        article.reload
+        article.reload.images.shuffle.each.with_index(1) { |image, i| image.update(position: i) }
       end
     end
 
     trait :with_10_images do
       after(:create) do |article|
         create_list(:image, 10, article: article)
-        article.reload
+        article.reload.images.shuffle.each.with_index(1) { |image, i| image.update(position: i) }
       end
     end
   end
