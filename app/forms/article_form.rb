@@ -57,12 +57,6 @@ class ArticleForm
     image_attributes.values.filter { |v| v['cl_id'] }
   end
 
-  def new_cl_ids
-    return [] if image_attributes.nil?
-
-    image_attributes.values.map { |v| v['cl_id'] }.compact
-  end
-
   def destroying_image_ids
     return [] if image_attributes.nil?
 
