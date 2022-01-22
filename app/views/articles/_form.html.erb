@@ -39,9 +39,9 @@
       <% end %>
     <% end %>
 
-    <div class="columns is-multiline is-centered" id="cloudinary-fileupload-previews">
+    <div class="columns is-multiline is-centered" id="cloudinary-fileupload-previews" data-sortable="items">
       <% article&.images&.each do |image| %>
-        <div class="column is-one-fifth is-flex">
+        <div class="column is-one-fifth is-flex" data-sortable-key="<%= image.id %>">
           <figure>
             <%= cl_image_tag image.cl_id, width: 500, height: 500, crop: :fill %>
           </figure>
@@ -49,15 +49,13 @@
         </div>
       <% end %>
 
-      <% if article_form.errors.any? %>
-        <% article_form.new_cl_ids.each do |cl_id| %>
-          <div class="column is-one-fifth is-flex">
-            <figure>
-              <%= cl_image_tag cl_id.split('#')[0].split('/')[3], width: 500, height: 500, crop: :fill %>
-            </figure>
-            <button type="button" class="delete is-medium js-delete-image-cache-button" data-public-id="<%= cl_id.split('#')[0].split('/')[3].split('.')[0] %>"></button>
-          </div>
-        <% end %>
+      <% article_form.image_attributes&.select { |k, v| v['cl_id'] }&.each do |k, v| %>
+        <div class="column is-one-fifth is-flex" data-sortable-key="<%= k %>">
+          <figure>
+            <%= cl_image_tag v['cl_id'].split(/[\/|#]/)[3], width: 500, height: 500, crop: :fill %>
+          </figure>
+          <button type="button" class="delete is-medium js-delete-image-cache-button" data-public-id="<%= v['cl_id'].split(/[\/|.]/)[3] %>"></button>
+        </div>
       <% end %>
     </div>
 
@@ -99,3 +97,4 @@
 <%= javascript_pack_tag 'jqueryCloudinaryMultipleUpload', 'data-turbolinks-track': 'reload' %>
 <%= javascript_pack_tag 'removeImage', 'data-turbolinks-track': 'reload' %>
 <%= javascript_pack_tag 'removeImageCache', 'data-turbolinks-track': 'reload' %>
+<%= javascript_pack_tag 'sortPositionInputs', 'data-turbolinks-track': 'reload' %>

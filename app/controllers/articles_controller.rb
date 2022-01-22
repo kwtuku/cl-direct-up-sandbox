@@ -3,7 +3,7 @@ class ArticlesController < ApplicationController
 
   # GET /articles
   def index
-    @articles = Article.eager_load(:images)
+    @articles = Article.eager_load(:images).order(position: :ASC).order(id: :DESC)
   end
 
   # GET /articles/1
@@ -56,6 +56,6 @@ class ArticlesController < ApplicationController
 
   # Only allow a list of trusted parameters through.
   def article_params
-    params.require(:article).permit(:title, :body, cl_ids: [], image_attributes: %i[id cl_id _destroy])
+    params.require(:article).permit(:title, :body, image_attributes: %i[id cl_id position _destroy])
   end
 end

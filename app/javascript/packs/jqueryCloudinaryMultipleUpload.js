@@ -64,14 +64,15 @@ $(document).ready(function () {
       }
     })
     .off("cloudinarydone").on("cloudinarydone", function (e, data) {
-      const preview = $('<div class="column is-one-fifth is-flex"></div>').appendTo(previews);
+      const key = new Date().valueOf();
+      const preview = $(`<div class="column is-one-fifth is-flex" data-sortable-key="${key}"></div>`).appendTo(previews);
       const publicId = data.result.public_id;
 
       $.cloudinary.image(publicId, {
         format: data.result.format, width: 500, height: 500, crop: "fill"
       }).appendTo($("<figure>").appendTo(preview));
 
-      $(`input[value*="${publicId}"]`).attr('name', `article[image_attributes][${new Date().valueOf()}][cl_id]`);
+      $(`input[value*="${publicId}"]`).attr('name', `article[image_attributes][${key}][cl_id]`);
 
       $("<a/>").
         addClass("delete_by_token delete is-medium").

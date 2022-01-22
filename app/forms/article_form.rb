@@ -31,7 +31,8 @@ class ArticleForm
         article.reload
       end
 
-      new_cl_ids.each { |cl_id| article.images.create!(cl_id: cl_id) }
+      updating_images.each { |image| article.images.find(image['id']).update!(position: image['position']) }
+      new_images.each { |image| article.images.create!(cl_id: image['cl_id'], position: image['position']) }
     end
 
     true
@@ -44,10 +45,16 @@ class ArticleForm
     article
   end
 
-  def new_cl_ids
+  def updating_images
     return [] if image_attributes.nil?
 
-    image_attributes.values.map { |v| v['cl_id'] }.compact
+    image_attributes.values.filter { |v| v['id'] && v['_destroy'] == 'false' }
+  end
+
+  def new_images
+    return [] if image_attributes.nil?
+
+    image_attributes.values.filter { |v| v['cl_id'] }
   end
 
   def destroying_image_ids
@@ -56,13 +63,19 @@ class ArticleForm
     image_attributes.values.filter { |v| v['_destroy'] == 'true' }.map { |v| v['id'] }
   end
 
+  def saved_images
+    return [] if image_attributes.nil?
+
+    image_attributes.values.filter { |v| v['_destroy'] != 'true' }
+  end
+
   private
 
   attr_reader :article
 
   def default_attributes
     image_attributes = article.images.map do |image|
-      [image.id, { **image.attributes.slice('id'), '_destroy' => 'false' }]
+      [image.id, { **image.attributes.slice('id', 'position'), '_destroy' => 'false' }]
     end.to_h
 
     {
@@ -74,18 +87,14 @@ class ArticleForm
 
   IMAGE_MAX_COUNT = 10
   def validate_max_image_count
-    return if new_cl_ids.nil?
-
-    return if (article.images.size + new_cl_ids.size - destroying_image_ids.size) <= IMAGE_MAX_COUNT
+    return if saved_images.size <= IMAGE_MAX_COUNT
 
     errors.add(:base, :too_many_images, message: "記事の画像は#{IMAGE_MAX_COUNT}枚以下にしてください")
   end
 
   IMAGE_MIN_COUNT = 1
   def validate_min_image_count
-    return if new_cl_ids.present?
-
-    return if (article.images.size - destroying_image_ids.size) >= IMAGE_MIN_COUNT
+    return if saved_images.size >= IMAGE_MIN_COUNT
 
     errors.add(:base, :require_images, message: "記事には画像が#{IMAGE_MIN_COUNT}枚以上必要です")
   end
