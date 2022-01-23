@@ -3,7 +3,7 @@ require 'rails_helper'
 RSpec.describe 'Images', type: :request do
   describe 'GET /articles/:id/images/new' do
     it 'returns ok' do
-      article = create(:article, :with_an_image)
+      article = create(:article, :with_images, images_count: 1)
       get new_article_image_path(article)
       expect(response).to have_http_status(:ok)
     end
@@ -19,7 +19,7 @@ RSpec.describe 'Images', type: :request do
 
   describe 'DELETE /articles/:article_id/images/:id' do
     context 'when an article has 2 images' do
-      let!(:article) { create(:article, :with_an_image) }
+      let!(:article) { create(:article, :with_images, images_count: 1) }
       let!(:image) { create(:image, article: article) }
 
       it 'returns found' do
@@ -39,7 +39,7 @@ RSpec.describe 'Images', type: :request do
       end
     end
 
-    context 'when an article has a image' do
+    context 'when an article has 1 image' do
       let!(:article) { create(:article) }
       let!(:image) { create(:image, article: article) }
 

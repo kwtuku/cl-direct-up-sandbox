@@ -24,7 +24,7 @@ RSpec.describe ArticleForm, type: :model do
       end
     end
 
-    context 'when new article and adding an image' do
+    context 'when new article and adding 1 image' do
       it 'returns []' do
         image_attributes = { Time.now.to_i.to_s => { 'cl_id' => Rack::Test::UploadedFile.new(example_image_path) } }
         attributes = { **attributes_for(:article), image_attributes: image_attributes }
@@ -35,7 +35,7 @@ RSpec.describe ArticleForm, type: :model do
 
     context 'when an article exists without destroying images' do
       it 'returns []' do
-        existing_article = create(:article, :with_an_image)
+        existing_article = create(:article, :with_images, images_count: 1)
         image_attributes = create_image_attributes(existing_article)
         attributes = { **attributes_for(:article), image_attributes: image_attributes }
         article_form = described_class.new(attributes, article: existing_article)
@@ -44,7 +44,7 @@ RSpec.describe ArticleForm, type: :model do
     end
 
     context 'when an article exists and destroying images' do
-      let(:existing_article) { create(:article, :with_3_images) }
+      let(:existing_article) { create(:article, :with_images, images_count: 3) }
 
       it 'returns an array of destroying_image_id' do
         destroying_image_id = existing_article.image_ids.sample
@@ -199,7 +199,7 @@ RSpec.describe ArticleForm, type: :model do
     end
 
     context 'when an article exists with 1 image without adding images' do
-      let!(:existing_article) { create(:article, :with_an_image) }
+      let!(:existing_article) { create(:article, :with_images, images_count: 1) }
       let(:article_form) do
         image_attributes = create_image_attributes(existing_article)
         attributes = { **attributes_for(:article), image_attributes: image_attributes }
@@ -220,7 +220,7 @@ RSpec.describe ArticleForm, type: :model do
     end
 
     context 'when an article exists with 1 image and adding 1 image' do
-      let!(:existing_article) { create(:article, :with_an_image) }
+      let!(:existing_article) { create(:article, :with_images, images_count: 1) }
       let(:article_form) do
         image_attributes = create_image_attributes(existing_article)
         image_attributes[Time.now.to_i.to_s] = { 'cl_id' => Rack::Test::UploadedFile.new(example_image_path) }
@@ -242,7 +242,7 @@ RSpec.describe ArticleForm, type: :model do
     end
 
     context 'when an article exists with 1 image and adding 9 images' do
-      let!(:existing_article) { create(:article, :with_an_image) }
+      let!(:existing_article) { create(:article, :with_images, images_count: 1) }
       let(:article_form) do
         image_attributes = create_image_attributes(existing_article)
         9.times { image_attributes[random_number] = { 'cl_id' => Rack::Test::UploadedFile.new(example_image_path) } }
@@ -264,7 +264,7 @@ RSpec.describe ArticleForm, type: :model do
     end
 
     context 'when an article exists with 1 image and adding 10 images' do
-      let!(:existing_article) { create(:article, :with_an_image) }
+      let!(:existing_article) { create(:article, :with_images, images_count: 1) }
       let(:article_form) do
         image_attributes = create_image_attributes(existing_article)
         10.times { image_attributes[random_number] = { 'cl_id' => Rack::Test::UploadedFile.new(example_image_path) } }
@@ -291,7 +291,7 @@ RSpec.describe ArticleForm, type: :model do
     end
 
     context 'when an article exists with 9 images without adding images' do
-      let!(:existing_article) { create(:article, :with_9_images) }
+      let!(:existing_article) { create(:article, :with_images, images_count: 9) }
       let(:article_form) do
         image_attributes = create_image_attributes(existing_article)
         attributes = { **attributes_for(:article), image_attributes: image_attributes }
@@ -312,7 +312,7 @@ RSpec.describe ArticleForm, type: :model do
     end
 
     context 'when an article exists with 9 images and adding 1 image' do
-      let!(:existing_article) { create(:article, :with_9_images) }
+      let!(:existing_article) { create(:article, :with_images, images_count: 9) }
       let(:article_form) do
         image_attributes = create_image_attributes(existing_article)
         image_attributes[Time.now.to_i.to_s] = { 'cl_id' => Rack::Test::UploadedFile.new(example_image_path) }
@@ -334,7 +334,7 @@ RSpec.describe ArticleForm, type: :model do
     end
 
     context 'when an article exists with 9 images and adding 2 images' do
-      let!(:existing_article) { create(:article, :with_9_images) }
+      let!(:existing_article) { create(:article, :with_images, images_count: 9) }
       let(:article_form) do
         image_attributes = create_image_attributes(existing_article)
         2.times { image_attributes[random_number] = { 'cl_id' => Rack::Test::UploadedFile.new(example_image_path) } }
@@ -361,7 +361,7 @@ RSpec.describe ArticleForm, type: :model do
     end
 
     context 'when an article exists with 10 images without adding images' do
-      let!(:existing_article) { create(:article, :with_10_images) }
+      let!(:existing_article) { create(:article, :with_images, images_count: 10) }
       let(:article_form) do
         image_attributes = create_image_attributes(existing_article)
         attributes = { **attributes_for(:article), image_attributes: image_attributes }
@@ -382,7 +382,7 @@ RSpec.describe ArticleForm, type: :model do
     end
 
     context 'when an article exists with 10 images and adding 1 image' do
-      let!(:existing_article) { create(:article, :with_10_images) }
+      let!(:existing_article) { create(:article, :with_images, images_count: 10) }
       let(:article_form) do
         image_attributes = create_image_attributes(existing_article)
         image_attributes[Time.now.to_i.to_s] = { 'cl_id' => Rack::Test::UploadedFile.new(example_image_path) }
@@ -427,7 +427,7 @@ RSpec.describe ArticleForm, type: :model do
 
     context 'when an article exists with 1 image and article and images are invalid' do
       let(:article_form) do
-        existing_article = create(:article, :with_an_image)
+        existing_article = create(:article, :with_images, images_count: 1)
         image_attributes = create_image_attributes(existing_article)
         10.times { image_attributes[random_number] = { 'cl_id' => Rack::Test::UploadedFile.new(example_image_path) } }
         attributes = { **attributes_for(:article, title: nil), image_attributes: image_attributes }
@@ -447,7 +447,7 @@ RSpec.describe ArticleForm, type: :model do
 
     context 'when an article exists with 9 images and article and images are invalid' do
       let(:article_form) do
-        existing_article = create(:article, :with_9_images)
+        existing_article = create(:article, :with_images, images_count: 9)
         image_attributes = create_image_attributes(existing_article)
         2.times { image_attributes[random_number] = { 'cl_id' => Rack::Test::UploadedFile.new(example_image_path) } }
         attributes = { **attributes_for(:article, title: nil), image_attributes: image_attributes }
@@ -467,7 +467,7 @@ RSpec.describe ArticleForm, type: :model do
 
     context 'when an article exists with 10 images and article and images are invalid' do
       let(:article_form) do
-        existing_article = create(:article, :with_10_images)
+        existing_article = create(:article, :with_images, images_count: 10)
         image_attributes = create_image_attributes(existing_article)
         image_attributes[Time.now.to_i.to_s] = { 'cl_id' => Rack::Test::UploadedFile.new(example_image_path) }
         attributes = { **attributes_for(:article, title: nil), image_attributes: image_attributes }
@@ -486,7 +486,7 @@ RSpec.describe ArticleForm, type: :model do
     end
 
     context 'when an article exists with 1 image and destroying 1 image' do
-      let!(:existing_article) { create(:article, :with_an_image) }
+      let!(:existing_article) { create(:article, :with_images, images_count: 1) }
       let(:article_form) do
         image_attributes = create_image_attributes(existing_article)
         image_attributes[existing_article.image_ids.first]['_destroy'] = 'true'
@@ -513,7 +513,7 @@ RSpec.describe ArticleForm, type: :model do
     end
 
     context 'when an article exists with 2 image and destroying 1 image' do
-      let!(:existing_article) { create(:article, :with_2_images) }
+      let!(:existing_article) { create(:article, :with_images, images_count: 2) }
       let(:article_form) do
         image_attributes = create_image_attributes(existing_article)
         image_attributes[existing_article.image_ids.sample]['_destroy'] = 'true'
@@ -535,7 +535,7 @@ RSpec.describe ArticleForm, type: :model do
     end
 
     context 'when an article exists with 10 images and destroying 1 image' do
-      let!(:existing_article) { create(:article, :with_10_images) }
+      let!(:existing_article) { create(:article, :with_images, images_count: 10) }
       let(:article_form) do
         image_attributes = create_image_attributes(existing_article)
         image_attributes[existing_article.image_ids.sample]['_destroy'] = 'true'
@@ -557,7 +557,7 @@ RSpec.describe ArticleForm, type: :model do
     end
 
     context 'when an article exists with 10 images and destroying 9 images' do
-      let!(:existing_article) { create(:article, :with_10_images) }
+      let!(:existing_article) { create(:article, :with_images, images_count: 10) }
       let(:article_form) do
         image_attributes = create_image_attributes(existing_article)
         existing_article.image_ids.sample(9).each { |id| image_attributes[id]['_destroy'] = 'true' }
@@ -579,7 +579,7 @@ RSpec.describe ArticleForm, type: :model do
     end
 
     context 'when an article exists with 10 images and destroying 10 images' do
-      let!(:existing_article) { create(:article, :with_10_images) }
+      let!(:existing_article) { create(:article, :with_images, images_count: 10) }
       let(:article_form) do
         image_attributes = create_image_attributes(existing_article)
         existing_article.image_ids.each { |id| image_attributes[id]['_destroy'] = 'true' }
@@ -606,7 +606,7 @@ RSpec.describe ArticleForm, type: :model do
     end
 
     context 'when an article exists with 1 image and destroying 1 image and adding 1 image' do
-      let!(:existing_article) { create(:article, :with_an_image) }
+      let!(:existing_article) { create(:article, :with_images, images_count: 1) }
       let(:article_form) do
         image_attributes = create_image_attributes(existing_article)
         image_attributes[existing_article.image_ids.first]['_destroy'] = 'true'
@@ -630,12 +630,12 @@ RSpec.describe ArticleForm, type: :model do
       it 'changes image_ids' do
         destroying_image_ids = existing_article.image_ids
         article_form.save
-        expect(existing_article.reload.image_ids).not_to match_array destroying_image_ids
+        expect(existing_article.image_ids).not_to match_array destroying_image_ids
       end
     end
 
     context 'when an article exists with 1 image and destroying 1 image and adding 10 images' do
-      let!(:existing_article) { create(:article, :with_an_image) }
+      let!(:existing_article) { create(:article, :with_images, images_count: 1) }
       let(:article_form) do
         image_attributes = create_image_attributes(existing_article)
         image_attributes[existing_article.image_ids.first]['_destroy'] = 'true'
@@ -658,7 +658,7 @@ RSpec.describe ArticleForm, type: :model do
     end
 
     context 'when an article exists with 1 image and destroying 1 image and adding 11 images' do
-      let!(:existing_article) { create(:article, :with_an_image) }
+      let!(:existing_article) { create(:article, :with_images, images_count: 1) }
       let(:article_form) do
         image_attributes = create_image_attributes(existing_article)
         image_attributes[existing_article.image_ids.first]['_destroy'] = 'true'
@@ -686,7 +686,7 @@ RSpec.describe ArticleForm, type: :model do
     end
 
     context 'when an article exists with 10 images and destroying 10 images and adding 1 image' do
-      let!(:existing_article) { create(:article, :with_10_images) }
+      let!(:existing_article) { create(:article, :with_images, images_count: 10) }
       let(:article_form) do
         image_attributes = create_image_attributes(existing_article)
         existing_article.image_ids.each { |id| image_attributes[id]['_destroy'] = 'true' }
@@ -709,7 +709,7 @@ RSpec.describe ArticleForm, type: :model do
     end
 
     context 'when an article exists with 10 images and destroying 10 images and adding 10 images' do
-      let!(:existing_article) { create(:article, :with_10_images) }
+      let!(:existing_article) { create(:article, :with_images, images_count: 10) }
       let(:article_form) do
         image_attributes = create_image_attributes(existing_article)
         existing_article.image_ids.each { |id| image_attributes[id]['_destroy'] = 'true' }
@@ -733,12 +733,12 @@ RSpec.describe ArticleForm, type: :model do
       it 'changes image_ids' do
         destroying_image_ids = existing_article.image_ids
         article_form.save
-        expect(existing_article.reload.image_ids).not_to match_array destroying_image_ids
+        expect(existing_article.image_ids).not_to match_array destroying_image_ids
       end
     end
 
     context 'when an article exists with 10 images and destroying 10 images and adding 11 images' do
-      let!(:existing_article) { create(:article, :with_10_images) }
+      let!(:existing_article) { create(:article, :with_images, images_count: 10) }
       let(:article_form) do
         image_attributes = create_image_attributes(existing_article)
         existing_article.image_ids.each { |id| image_attributes[id]['_destroy'] = 'true' }

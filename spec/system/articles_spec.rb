@@ -2,9 +2,9 @@ require 'rails_helper'
 
 RSpec.describe 'Articles', type: :system do
   before do
-    create(:article, :with_an_image)
-    create_list(:article, 2, :with_2_images)
-    create(:article, :with_3_images) do |article|
+    create(:article, :with_images, images_count: 1)
+    create_list(:article, 2, :with_images, images_count: 2)
+    create(:article, :with_images, images_count: 3) do |article|
       article.images.first.update(position: 4)
       create(:image, position: 1, article: article)
     end
