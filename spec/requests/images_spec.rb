@@ -1,6 +1,22 @@
 require 'rails_helper'
 
 RSpec.describe 'Images', type: :request do
+  describe 'GET /articles/:id/images/new' do
+    it 'returns ok' do
+      article = create(:article, :with_an_image)
+      get new_article_image_path(article)
+      expect(response).to have_http_status(:ok)
+    end
+  end
+
+  describe 'GET /articles/:id/images/:image_id/edit' do
+    it 'returns ok' do
+      image = create(:image)
+      get edit_article_image_path(image.article, image)
+      expect(response).to have_http_status(:ok)
+    end
+  end
+
   describe 'DELETE /articles/:article_id/images/:id' do
     context 'when an article has 2 images' do
       let!(:article) { create(:article, :with_an_image) }
