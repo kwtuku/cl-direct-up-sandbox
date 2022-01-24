@@ -31,4 +31,24 @@ RSpec.describe 'Articles', type: :request do
       expect(response).to have_http_status(:ok)
     end
   end
+
+  describe 'DELETE /articles/:id' do
+    let!(:article) { create(:article, :with_images) }
+
+    it 'returns found' do
+      delete article_path(article)
+      expect(response).to have_http_status(:found)
+    end
+
+    it 'redirects to articles_url' do
+      delete article_path(article)
+      expect(response).to redirect_to articles_url
+    end
+
+    it 'decreases article count by 1' do
+      expect do
+        delete article_path(article)
+      end.to change(Article, :count).by(-1)
+    end
+  end
 end
