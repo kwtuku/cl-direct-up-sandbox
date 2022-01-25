@@ -12,11 +12,16 @@ AllCops:
     - tmp/**/*
     - vendor/**/*
 
+Layout/LineLength:
+  IgnoredPatterns:
+    - '# '
+
 Layout/MultilineMethodCallIndentation:
   EnforcedStyle: indented
 
 Metrics/BlockLength:
   Exclude:
+    - config/environments/*
     - spec/**/*
 
 Style/Documentation:
