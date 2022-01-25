@@ -13,17 +13,17 @@ deleteButtons.forEach((deleteButton) => {
         'X-CSRF-Token': csrfToken,
       },
     })
-      .then(response => {
+      .then((response) => {
         if (!response.ok) {
           throw new Error(`${response.status} (${response.statusText})`);
         }
-        return response.json()
+        return response.json();
       })
       .then(function () {
         hiddenInput.remove();
         imageCache.remove();
       })
-      .catch(error => {
+      .catch((error) => {
         alert(error);
       });
   });
