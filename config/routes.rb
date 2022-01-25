@@ -5,7 +5,7 @@ Rails.application.routes.draw do
 
   namespace :api, format: 'json' do
     namespace :v0 do
-      resources :admin_cloudinary, only: %i[destroy]
+      resources :admin_cloudinary, only: %i[destroy], param: :public_id
     end
   end
 
