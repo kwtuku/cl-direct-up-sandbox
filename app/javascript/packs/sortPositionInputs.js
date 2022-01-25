@@ -1,4 +1,4 @@
-import Sortable from 'sortablejs/modular/sortable.core.esm.js';
+import Sortable from 'sortablejs/modular/sortable.core.esm';
 
 const items = document.querySelector('[data-sortable="items"]');
 

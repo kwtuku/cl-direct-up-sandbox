@@ -3,7 +3,7 @@ const deleteButtons = document.querySelectorAll('.js-delete-image-cache-button')
 
 deleteButtons.forEach((deleteButton) => {
   const imageCache = deleteButton.parentNode;
-  const publicId = deleteButton.dataset.publicId;
+  const { publicId } = deleteButton.dataset;
   const hiddenInput = document.querySelector(`input[value*="${publicId}"]`);
 
   deleteButton.addEventListener('click', () => {
@@ -19,7 +19,7 @@ deleteButtons.forEach((deleteButton) => {
         }
         return response.json();
       })
-      .then(function () {
+      .then(() => {
         hiddenInput.remove();
         imageCache.remove();
       })

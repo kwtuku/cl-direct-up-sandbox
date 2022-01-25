@@ -1,4 +1,4 @@
-$(document).ready(function () {
+$(() => {
   const previews = $('#cloudinary-fileupload-previews');
   const fileuploadStatus = $('#cloudinary-fileupload-status');
   const fileuploadProgress = $('#cloudinary-fileupload-progress');
@@ -12,23 +12,23 @@ $(document).ready(function () {
     .cloudinary_fileupload({
       acceptFileTypes: /(\.|\/)(jpe?g|png|webp)$/i,
       maxFileSize: 2000000,
-      getNumberOfFiles: function () {
+      getNumberOfFiles() {
         return uploadedFilesCounter;
       },
-      maxNumberOfFiles: maxNumberOfFiles,
+      maxNumberOfFiles,
       messages: {
         acceptFileTypes: 'jpg, jpeg, png, webpファイルのみがアップロードできます',
         maxFileSize: '2MB以下のファイルがアップロードできます',
         maxNumberOfFiles: `画像は最大で${maxNumberOfFiles}枚までアップロードできます`,
       },
       dropZone: '#drop-zone',
-      change: function (e, data) {
+      change(e, data) {
         if (data.files.length > maxNumberOfFiles) {
           alert(`画像は最大で${maxNumberOfFiles}枚までアップロードできます`);
           return false;
         }
       },
-      processalways: function (e, data) {
+      processalways(e, data) {
         const errorMessage = data.files[0].error;
 
         if (data.files.error && displayedValidationErrorMessages.indexOf(errorMessage) === -1) {
@@ -37,22 +37,22 @@ $(document).ready(function () {
         }
 
         if (!data.files.error) {
-          uploadedFilesCounter++;
+          uploadedFilesCounter += 1;
         }
 
-        processedFilesCounter++;
+        processedFilesCounter += 1;
 
         if (processedFilesCounter === data.originalFiles.length) {
           displayedValidationErrorMessages = [];
           processedFilesCounter = 0;
         }
       },
-      start: function (e) {
+      start() {
         fileuploadStatus.removeClass('is-hidden');
         fileuploadMessage.text('アップロードを開始...');
       },
-      progressall: function (e, data) {
-        let progressAllValue = Math.round((data.loaded * 100.0) / data.total);
+      progressall(e, data) {
+        const progressAllValue = Math.round((data.loaded * 100.0) / data.total);
 
         fileuploadProgress.val(progressAllValue);
         fileuploadMessage.text(`アップロード中... ${progressAllValue}%`);
@@ -61,12 +61,12 @@ $(document).ready(function () {
           fileuploadProgress.val('0');
         }
       },
-      fail: function (e, data) {
+      fail() {
         alert('アップロードに失敗しました');
       },
     })
     .off('cloudinarydone')
-    .on('cloudinarydone', function (e, data) {
+    .on('cloudinarydone', (e, data) => {
       const key = new Date().valueOf();
       const preview = $(`<div class="column is-one-fifth is-flex" data-sortable-key="${key}"></div>`).appendTo(
         previews,
@@ -90,17 +90,17 @@ $(document).ready(function () {
         .data({ delete_token: data.result.delete_token })
         .html('&times;')
         .appendTo(preview)
-        .click(function (e) {
-          e.preventDefault();
+        .on('click', function deleteImage(event) {
+          event.preventDefault();
           $.cloudinary
             .delete_by_token($(this).data('delete_token'))
-            .done(function () {
+            .done(() => {
               preview.remove();
               $(`input[value*="${publicId}"]`).remove();
 
-              uploadedFilesCounter--;
+              uploadedFilesCounter -= 1;
             })
-            .fail(function () {
+            .fail(() => {
               alert('画像が削除できません');
             });
         });
