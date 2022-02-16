@@ -10,8 +10,11 @@ class ArticleForm
 
   validates :title, presence: true
   validates :body, presence: true
-  validate :validate_max_image_count
-  validate :validate_min_image_count
+  validate :validate_max_images_count
+  validate :validate_min_images_count
+
+  MAX_IMAGES_COUNT = 10
+  MIN_IMAGES_COUNT = 1
 
   def initialize(attributes = nil, article: Article.new)
     @article = article
@@ -27,13 +30,15 @@ class ArticleForm
 
       destroying_images = article.images.where(id: destroying_image_ids)
       destroying_images.delete_all if destroying_images.present?
-      article.reload
 
       updating_images = article.images.where(id: updating_image_ids).reorder(:id)
-      updating_images.zip(updating_image_positions) { |image, position| image.update!(position: position) }
+      updating_images.zip(updating_image_positions) do |image, position|
+        image.position = position
+        image.save!(context: :article_form_save)
+      end
 
       new_image_attributes_collection.each do |attrs|
-        article.images.create!(cl_id: attrs['cl_id'], position: attrs['position'])
+        article.images.new(cl_id: attrs['cl_id'], position: attrs['position']).save!(context: :article_form_save)
       end
     end
 
@@ -99,17 +104,15 @@ class ArticleForm
     }
   end
 
-  IMAGE_MAX_COUNT = 10
-  def validate_max_image_count
-    return if saved_images.size <= IMAGE_MAX_COUNT
+  def validate_max_images_count
+    return if saved_images.size <= MAX_IMAGES_COUNT
 
-    errors.add(:base, :too_many_images, message: "記事の画像は#{IMAGE_MAX_COUNT}枚以下にしてください")
+    errors.add(:base, :too_many_images, message: "記事の画像は#{MAX_IMAGES_COUNT}枚以下にしてください")
   end
 
-  IMAGE_MIN_COUNT = 1
-  def validate_min_image_count
-    return if saved_images.size >= IMAGE_MIN_COUNT
+  def validate_min_images_count
+    return if saved_images.size >= MIN_IMAGES_COUNT
 
-    errors.add(:base, :require_images, message: "記事には画像が#{IMAGE_MIN_COUNT}枚以上必要です")
+    errors.add(:base, :require_images, message: "記事には画像が#{MIN_IMAGES_COUNT}枚以上必要です")
   end
 end
