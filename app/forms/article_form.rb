@@ -62,7 +62,7 @@ class ArticleForm
   def updating_image_positions
     return [] if image_attributes.nil?
 
-    updating_image_attributes_collection.sort_by { |attrs| attrs['id'] }.map { |attrs| attrs['position'] }
+    updating_image_attributes_collection.sort_by { |attrs| attrs['id'].to_i }.map { |attrs| attrs['position'] }
   end
 
   def new_image_attributes_collection
