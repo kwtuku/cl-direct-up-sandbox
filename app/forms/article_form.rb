@@ -10,8 +10,7 @@ class ArticleForm
 
   validates :title, presence: true
   validates :body, presence: true
-  validate :validate_max_images_count
-  validate :validate_min_images_count
+  validate :validate_images_count
 
   MAX_IMAGES_COUNT = 10
   MIN_IMAGES_COUNT = 1
@@ -82,12 +81,6 @@ class ArticleForm
     image_attributes.values.filter { |attrs| attrs['_destroy'] == 'true' }.map { |attrs| attrs['id'] }
   end
 
-  def saved_images
-    return [] if image_attributes.nil?
-
-    image_attributes.values.filter { |v| v['_destroy'] != 'true' }
-  end
-
   private
 
   attr_reader :article
@@ -104,15 +97,12 @@ class ArticleForm
     }
   end
 
-  def validate_max_images_count
-    return if saved_images.size <= MAX_IMAGES_COUNT
+  def validate_images_count
+    images_count = article.images.size - destroying_image_ids.size + new_image_attributes_collection.size
+
+    errors.add(:base, :require_images, message: "記事には画像が#{MIN_IMAGES_COUNT}枚以上必要です") if images_count < MIN_IMAGES_COUNT
+    return if images_count <= MAX_IMAGES_COUNT
 
     errors.add(:base, :too_many_images, message: "記事の画像は#{MAX_IMAGES_COUNT}枚以下にしてください")
-  end
-
-  def validate_min_images_count
-    return if saved_images.size >= MIN_IMAGES_COUNT
-
-    errors.add(:base, :require_images, message: "記事には画像が#{MIN_IMAGES_COUNT}枚以上必要です")
   end
 end
