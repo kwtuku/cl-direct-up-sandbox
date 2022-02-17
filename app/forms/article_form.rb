@@ -51,34 +51,34 @@ class ArticleForm
     article
   end
 
-  def updating_image_attributes_collection
+  def sanitized_image_attributes_collection
     return [] if image_attributes.nil?
 
-    image_attributes.values.filter { |attrs| attrs['_destroy'] == 'false' }
+    article_image_ids = article.image_ids
+    image_attributes.values
+      .reject { |attrs| attrs['id'] && article_image_ids.exclude?(attrs['id'].to_i) }
+      .reject { |attrs| attrs['_destroy'] && !attrs['id'] }
+      .reject { |attrs| attrs['_destroy'] == 'false' && !attrs['position'] }
+  end
+
+  def updating_image_attributes_collection
+    sanitized_image_attributes_collection.filter { |attrs| attrs['_destroy'] == 'false' }
   end
 
   def updating_image_ids
-    return [] if image_attributes.nil?
-
     updating_image_attributes_collection.map { |attrs| attrs['id'] }
   end
 
   def updating_image_positions
-    return [] if image_attributes.nil?
-
     updating_image_attributes_collection.sort_by { |attrs| attrs['id'].to_i }.map { |attrs| attrs['position'] }
   end
 
   def new_image_attributes_collection
-    return [] if image_attributes.nil?
-
-    image_attributes.values.filter { |attrs| attrs['cl_id'] }
+    sanitized_image_attributes_collection.filter { |attrs| attrs['cl_id'] }
   end
 
   def destroying_image_ids
-    return [] if image_attributes.nil?
-
-    image_attributes.values.filter { |attrs| attrs['_destroy'] == 'true' }.map { |attrs| attrs['id'] }
+    sanitized_image_attributes_collection.filter { |attrs| attrs['_destroy'] == 'true' }.map { |attrs| attrs['id'] }
   end
 
   private
