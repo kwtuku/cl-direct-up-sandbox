@@ -10,8 +10,10 @@ class ArticleForm
 
   validates :title, presence: true
   validates :body, presence: true
-  validate :validate_max_image_count
-  validate :validate_min_image_count
+  validate :validate_images_count
+
+  MAX_IMAGES_COUNT = 10
+  MIN_IMAGES_COUNT = 1
 
   def initialize(attributes = nil, article: Article.new)
     @article = article
@@ -25,14 +27,18 @@ class ArticleForm
     ActiveRecord::Base.transaction do
       article.update!(title: title, body: body)
 
-      if destroying_image_ids.present?
-        destroying_images = article.images.where(id: destroying_image_ids)
-        destroying_images.delete_all
-        article.reload
+      destroying_images = article.images.where(id: destroying_image_ids)
+      destroying_images.delete_all if destroying_images.present?
+
+      updating_images = article.images.where(id: updating_image_ids).reorder(:id)
+      updating_images.zip(updating_image_positions) do |image, position|
+        image.position = position
+        image.save!(context: :article_form_save)
       end
 
-      updating_images.each { |image| article.images.find(image['id']).update!(position: image['position']) }
-      new_images.each { |image| article.images.create!(cl_id: image['cl_id'], position: image['position']) }
+      new_image_attributes_collection.each do |attrs|
+        article.images.new(cl_id: attrs['cl_id'], position: attrs['position']).save!(context: :article_form_save)
+      end
     end
 
     true
@@ -45,28 +51,34 @@ class ArticleForm
     article
   end
 
-  def updating_images
+  def sanitized_image_attributes_collection
     return [] if image_attributes.nil?
 
-    image_attributes.values.filter { |v| v['id'] && v['_destroy'] == 'false' }
+    article_image_ids = article.image_ids
+    image_attributes.values
+      .reject { |attrs| attrs['id'] && article_image_ids.exclude?(attrs['id'].to_i) }
+      .reject { |attrs| attrs['_destroy'] && !attrs['id'] }
+      .reject { |attrs| attrs['_destroy'] == 'false' && !attrs['position'] }
   end
 
-  def new_images
-    return [] if image_attributes.nil?
+  def updating_image_attributes_collection
+    sanitized_image_attributes_collection.filter { |attrs| attrs['_destroy'] == 'false' }
+  end
 
-    image_attributes.values.filter { |v| v['cl_id'] }
+  def updating_image_ids
+    updating_image_attributes_collection.map { |attrs| attrs['id'] }
+  end
+
+  def updating_image_positions
+    updating_image_attributes_collection.sort_by { |attrs| attrs['id'].to_i }.map { |attrs| attrs['position'] }
+  end
+
+  def new_image_attributes_collection
+    sanitized_image_attributes_collection.filter { |attrs| attrs['cl_id'] }
   end
 
   def destroying_image_ids
-    return [] if image_attributes.nil?
-
-    image_attributes.values.filter { |v| v['_destroy'] == 'true' }.map { |v| v['id'] }
-  end
-
-  def saved_images
-    return [] if image_attributes.nil?
-
-    image_attributes.values.filter { |v| v['_destroy'] != 'true' }
+    sanitized_image_attributes_collection.filter { |attrs| attrs['_destroy'] == 'true' }.map { |attrs| attrs['id'] }
   end
 
   private
@@ -85,17 +97,12 @@ class ArticleForm
     }
   end
 
-  IMAGE_MAX_COUNT = 10
-  def validate_max_image_count
-    return if saved_images.size <= IMAGE_MAX_COUNT
+  def validate_images_count
+    images_count = article.images.size - destroying_image_ids.size + new_image_attributes_collection.size
 
-    errors.add(:base, :too_many_images, message: "記事の画像は#{IMAGE_MAX_COUNT}枚以下にしてください")
-  end
+    errors.add(:base, :require_images, message: "記事には画像が#{MIN_IMAGES_COUNT}枚以上必要です") if images_count < MIN_IMAGES_COUNT
+    return if images_count <= MAX_IMAGES_COUNT
 
-  IMAGE_MIN_COUNT = 1
-  def validate_min_image_count
-    return if saved_images.size >= IMAGE_MIN_COUNT
-
-    errors.add(:base, :require_images, message: "記事には画像が#{IMAGE_MIN_COUNT}枚以上必要です")
+    errors.add(:base, :too_many_images, message: "記事の画像は#{MAX_IMAGES_COUNT}枚以下にしてください")
   end
 end
