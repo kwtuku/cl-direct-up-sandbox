@@ -15,6 +15,59 @@ RSpec.describe ArticleForm, type: :model do
     end.to_h
   end
 
+  describe '#sanitized_image_attributes_collection' do
+    context 'when new article with no image_attributes' do
+      it 'returns []' do
+        attributes = { **attributes_for(:article), image_attributes: nil }
+        article_form = described_class.new(attributes, article: Article.new)
+        expect(article_form.sanitized_image_attributes_collection).to eq []
+      end
+    end
+
+    context 'when new article and image_attributes has other article image_id' do
+      it 'removes other article image_id' do
+        other_article_image_id = create(:image).id
+        image_attributes = {
+          Time.now.to_i.to_s => { 'cl_id' => 'image_path' },
+          random_number => { 'id' => other_article_image_id.to_s, '_destroy' => 'true' }
+        }
+        attributes = { **attributes_for(:article), image_attributes: image_attributes }
+        article_form = described_class.new(attributes, article: Article.new)
+        expect(article_form.sanitized_image_attributes_collection.size).to eq 1
+        sanitized_image_ids = article_form.sanitized_image_attributes_collection.map { |attrs| attrs['id'] }.compact
+        expect(sanitized_image_ids).not_to include other_article_image_id
+      end
+    end
+
+    context 'when existing article and image_attributes has other article image_id' do
+      it 'removes other article image_id' do
+        other_article_image_id = create(:image).id
+        existing_article = create(:article, :with_images, images_count: 1)
+        image_attributes = described_class.new(article: existing_article).image_attributes
+        image_attributes[Time.now.to_i.to_s] = { 'cl_id' => 'image_path' }
+        image_attributes[random_number] = { 'id' => other_article_image_id.to_s, '_destroy' => 'true' }
+        attributes = { **attributes_for(:article), image_attributes: image_attributes }
+        article_form = described_class.new(attributes, article: existing_article)
+        expect(article_form.sanitized_image_attributes_collection.size).to eq 2
+        sanitized_image_ids = article_form.sanitized_image_attributes_collection.map { |attrs| attrs['id'] }.compact
+        expect(sanitized_image_ids).not_to include other_article_image_id
+      end
+    end
+
+    context 'when existing article and image_attributes has invalid attributes' do
+      it 'removes invalid attributes' do
+        existing_article = create(:article, :with_images, images_count: 3)
+        image_attributes = described_class.new(article: existing_article).image_attributes
+        image_ids = existing_article.image_ids
+        image_attributes[image_ids.first] = { 'position' => 2, '_destroy' => 'true' }
+        image_attributes[image_ids.second] = { 'id' => image_ids.second, '_destroy' => 'false' }
+        attributes = { **attributes_for(:article), image_attributes: image_attributes }
+        article_form = described_class.new(attributes, article: existing_article)
+        expect(article_form.sanitized_image_attributes_collection.size).to eq 1
+      end
+    end
+  end
+
   describe '#destroying_image_ids' do
     context 'when new article with no images' do
       it 'returns []' do
